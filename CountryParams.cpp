@@ -200,18 +200,18 @@ else if (x == 4){                                          // Uasin Gishu - KENY
 
 void getParamsString(int x){
     if (x == 1){
-        ParamDirectory="/Users/pperezgu/Dropbox/Ageing in Kenya and Zimbabwe - project/New_Model_Africa/HIVModelZimbabwe/Kenya/";
+        ParamDirectory="/Users/pperezgu/Dropbox/My_Africamodel/New_Model_Africa/HIVModelZimbabwe/Kenya/";
     }
 
     else if (x == 2){
-        ParamDirectory="/Users/pperezgu/Dropbox/Ageing in Kenya and Zimbabwe - project/New_Model_Africa/HIVModelZimbabwe/Zimbabwe/";
+        ParamDirectory="/Users/pperezgu/Dropbox/My_Africamodel/New_Model_Africa/HIVModelZimbabwe/Zimbabwe/";
     }
     else if (x == 3){
-        ParamDirectory="/Users/pperezgu/Dropbox/Ageing in Kenya and Zimbabwe - project/New_Model_Africa/HIVModelZimbabwe/Malawi/";
+        ParamDirectory="/Users/pperezgu/Dropbox/My_Africamodel/New_Model_Africa/HIVModelZimbabwe/Malawi/";
     }
     
     else if (x == 4){
-        ParamDirectory="/Users/pperezgu/Dropbox/Ageing in Kenya and Zimbabwe - project/New_Model_Africa/HIVModelZimbabwe/Kenya_UG/";
+        ParamDirectory="/Users/pperezgu/Dropbox/My_Africamodel/New_Model_Africa/HIVModelZimbabwe/Kenya_UG/";
     }
     
     
