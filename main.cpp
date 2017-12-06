@@ -35,7 +35,7 @@ using namespace std;
 int country=1;
 
 // STEP 2 --- NAME THE DIRECTORY AND TAG FOR THE OUTPUT FILE
-string OutputFileDirectory="/Users/rachelcassidy/Dropbox/Latest.csv";
+string OutputFileDirectory="/Users/pperezgu/Dropbox/Latest.csv";
 
 /// STEP 3 --- AT WHAT FACTOR SHOULD WE RUN THE POPULATION?
 int factor=100; //county = 1, country = 100

@@ -383,7 +383,7 @@ void person::GetMyDateOfHPVInfection(){
                     TestHPVDate=(DoB+j)+YearFraction;
                     if (TestHPVDate<DateOfDeath){HPV_DateofInfection=TestHPVDate;}
                     if (TestHPVDate>=DateOfDeath) {HPV_DateofInfection=-977;}
-                    if (TestHPVDate<1950) {HPV_DateofInfection=-978;}   //This is just so the MATLAB code works - we're only interested from 1950 onwards
+   //                 if (TestHPVDate<1950) {HPV_DateofInfection=-978;}   //This is just so the MATLAB code works - we're only interested from 1950 onwards
                 }
                         // Error message:
             if (months>12){cout << "Error 2: There is an error and HPV infection will ocurr in the wrong year: " << months << endl;}

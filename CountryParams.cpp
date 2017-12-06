@@ -162,7 +162,7 @@ else if (x == 4){                                          // Uasin Gishu - KENY
     ART_start_yr=2004;
     ageAdult=15;
     Sex_ratio=0.50237783022;
-    HPV_Prevalence=0.388;
+    HPV_Prevalence=0.388; //normally 0.388
     CIN1_Prevalence=0.2;
     CIN2_3_Prevalence=0.4;
     CIS_Prevalence=0.65;
@@ -200,18 +200,18 @@ else if (x == 4){                                          // Uasin Gishu - KENY
 
 void getParamsString(int x){
     if (x == 1){
-        ParamDirectory="/Users/rachelcassidy/Dropbox/Ageing in Kenya and Zimbabwe - project/New_Model_Africa/HIVModelZimbabwe/Kenya/";
+        ParamDirectory="/Users/pperezgu/Dropbox/Ageing in Kenya and Zimbabwe - project/New_Model_Africa/HIVModelZimbabwe/Kenya/";
     }
 
     else if (x == 2){
-        ParamDirectory="/Users/rachelcassidy/Dropbox/Ageing in Kenya and Zimbabwe - project/New_Model_Africa/HIVModelZimbabwe/Zimbabwe/";
+        ParamDirectory="/Users/pperezgu/Dropbox/Ageing in Kenya and Zimbabwe - project/New_Model_Africa/HIVModelZimbabwe/Zimbabwe/";
     }
     else if (x == 3){
-        ParamDirectory="/Users/rachelcassidy/Dropbox/Ageing in Kenya and Zimbabwe - project/New_Model_Africa/HIVModelZimbabwe/Malawi/";
+        ParamDirectory="/Users/pperezgu/Dropbox/Ageing in Kenya and Zimbabwe - project/New_Model_Africa/HIVModelZimbabwe/Malawi/";
     }
     
     else if (x == 4){
-        ParamDirectory="/Users/rachelcassidy/Dropbox/Ageing in Kenya and Zimbabwe - project/New_Model_Africa/HIVModelZimbabwe/Kenya_UG/";
+        ParamDirectory="/Users/pperezgu/Dropbox/Ageing in Kenya and Zimbabwe - project/New_Model_Africa/HIVModelZimbabwe/Kenya_UG/";
     }
     
     

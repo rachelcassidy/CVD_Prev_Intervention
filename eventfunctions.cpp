@@ -413,6 +413,7 @@ void EventMyHPVInfection(person *MyPointerToPerson){
         ///Decide if person recovers or moves on to CIN1
         if (MyPointerToPerson->HPV_DateofInfection>0){
             MyPointerToPerson->HPV_Status=HPV_Status_HPV;
+            
             int year = floor(*p_GT);
             double months = floor(((1-(*p_GT-year+0.01))*12));
             
