@@ -414,6 +414,7 @@ void EventMyHPVInfection(person *MyPointerToPerson){
         if (MyPointerToPerson->HPV_DateofInfection>0){
             MyPointerToPerson->HPV_Status=HPV_Status_HPV;
             
+            
             int year = floor(*p_GT);
             double months = floor(((1-(*p_GT-year+0.01))*12));
             
@@ -424,12 +425,15 @@ void EventMyHPVInfection(person *MyPointerToPerson){
             std::uniform_int_distribution<> dis{0, 3};
             j = dis(gen);
             
+            
             double YearFraction=-999;
             if(months>=1){YearFraction=(RandomMinMax_2(0,months))/12.1;}            // This gets month of birth as a fraction of a year
             if(months<1){YearFraction=0;}
             double    h = ((double)rand() / (RAND_MAX));                // Get a random number between 0 and 1.  NB/ THIS SHOULD HAVE A PRECISION OF 15 decimals which should be enough but lets be careful!!
             TestCIN1Date=(MyPointerToPerson->HPV_DateofInfection+j)+YearFraction;
             if (h>CIN1_Prevalence){MyPointerToPerson->CIN1_DateofInfection=no_hpv_infection;}{MyPointerToPerson->HPV_DateofRecovery=TestCIN1Date;}                // In case they recover from HPV
+            
+            cout << "Person " << MyPointerToPerson << " drew a risk of " << h << endl;
             
             event * HPV_DateofRecoveryEvent = new event;
             Events.push_back(HPV_DateofRecoveryEvent);
@@ -449,6 +453,8 @@ void EventMyHPVInfection(person *MyPointerToPerson){
                 CIN1_DateofInfectionEvent->person_ID = MyPointerToPerson;
                 p_PQ->push(CIN1_DateofInfectionEvent);
                 
+                cout << "Therefore, " << MyPointerToPerson << " progressed from HPV infection to CIN1 within year " << j << endl;
+            
                 }
             }
     }

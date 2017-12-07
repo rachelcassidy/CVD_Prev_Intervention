@@ -385,8 +385,9 @@ void person::GetMyDateOfHPVInfection(){
                     if (TestHPVDate>=DateOfDeath) {HPV_DateofInfection=-977;}
    //                 if (TestHPVDate<1950) {HPV_DateofInfection=-978;}   //This is just so the MATLAB code works - we're only interested from 1950 onwards
                 }
-            cout << "Probability for HPV of " << PersonID << " is " << h << ", and infection occurred on " << TestHPVDate << " and she died in " << DateOfDeath << endl;
-                        // Error message:
+          //  cout << "Probability for HPV of " << PersonID << " is " << h << ", and infection occurred on " << TestHPVDate << " and she died in " << DateOfDeath << endl;
+            
+            // Error message:
             if (months>12){cout << "Error 2: There is an error and HPV infection will ocurr in the wrong year: " << months << endl;}
             if (YearFraction>fractionyear){cout << "Error 2: There is an error!" << YearFraction << " and fraction " << fractionyear<< endl;cout << "Global Time "<< *p_GT << " and months " << months << endl;}
             if(YearFraction==-999){cout << "Error 3: Yearfraction hasn't been initialised" << months << endl;}
