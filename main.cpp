@@ -70,14 +70,14 @@ double      CIN1_Prevalence;
 double      CIN2_3_Prevalence;
 double      CIS_Prevalence;
 double      ICC_Prevalence;
-double no_hpv_infection;
-double HPV_Status_HPV;
-double HPV_Status_CIN1;
-double HPV_Status_CIN2_3;
-double HPV_Status_CIS;
-double HPV_Status_ICC;
-double HPV_Status_Recovered;
-double hpv_date_after_death;
+double      no_hpv_infection;
+double      HPV_Status_HPV;
+double      HPV_Status_CIN1;
+double      HPV_Status_CIN2_3;
+double      HPV_Status_CIS;
+double      HPV_Status_ICC;
+double      HPV_Status_Recovered;
+double      hpv_date_after_death;
 
 
 int         ageAdult;                                                                                           //////////

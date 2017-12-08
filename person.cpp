@@ -358,14 +358,14 @@ void person::GetMyDoBNewEntry(){							// --- Assign Age for New Entry ---
 ///////////////////////////////////////////   STAGE 1 /////////////////////////////////////////////
 void person::GetMyDateOfHPVInfection(){
     
-//    cout << "Lets see if this person will get HPV!" << endl;
-    
-    if(DoB>=1900 && Alive==1 && Sex==2){        // Only people born from 1900, alive and female can ever experience HPV in their life
-        // Let's see when people are getting infected with HPV
+    if(DoB>=1900 && Alive==1 && Sex==2){
+        
+        int year = floor(*p_GT);
+        double months = floor(((1-(*p_GT-year+0.01))*12));
+        double fractionyear = 1-(*p_GT-year);
+        
+        
         if(HPV_DateofInfection==-999){
-            int year = floor(*p_GT);
-            double months = floor(((1-(*p_GT-year+0.01))*12));
-            double fractionyear = 1-(*p_GT-year);
             
             int j=0;
             std::random_device rd;
@@ -388,7 +388,7 @@ void person::GetMyDateOfHPVInfection(){
           
             
             
-            cout << "Probability for HPV of " << PersonID << ", born in " << DoB << " is " << h << ", and infection occurred on " << TestHPVDate << " and she died in " << DateOfDeath << endl;
+           // cout << "Probability for HPV of " << PersonID << ", born in " << DoB << " is " << h << ", and infection occurred at age " << TestHPVDate-DoB << ". The infection occurred " << DateOfDeath-TestHPVDate << " years before here death." << endl;
             
             
             

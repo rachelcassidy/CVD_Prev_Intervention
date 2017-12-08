@@ -433,7 +433,7 @@ void EventMyHPVInfection(person *MyPointerToPerson){
             TestCIN1Date=(MyPointerToPerson->HPV_DateofInfection+j)+YearFraction;
             if (h>CIN1_Prevalence){MyPointerToPerson->CIN1_DateofInfection=no_hpv_infection;}{MyPointerToPerson->HPV_DateofRecovery=TestCIN1Date;}                // In case they recover from HPV
             
-            cout << "Person " << MyPointerToPerson << " drew a risk of " << h << endl;
+            // cout << "Person " << MyPointerToPerson << " drew a risk of " << h << endl;
             
             event * HPV_DateofRecoveryEvent = new event;
             Events.push_back(HPV_DateofRecoveryEvent);
@@ -453,7 +453,7 @@ void EventMyHPVInfection(person *MyPointerToPerson){
                 CIN1_DateofInfectionEvent->person_ID = MyPointerToPerson;
                 p_PQ->push(CIN1_DateofInfectionEvent);
                 
-                cout << "Therefore, " << MyPointerToPerson << " progressed from HPV infection to CIN1 within year " << j << endl;
+                //cout << "Therefore, " << MyPointerToPerson << " progressed from HPV infection to CIN1 within year " << j << endl;
             
                 }
             }

@@ -68,7 +68,7 @@ void loadCountryParams(int x){
         ART_start_yr=2004;
         ageAdult=15;
         Sex_ratio=0.495639296;
-        HPV_Prevalence=0.388;
+        HPV_Prevalence=0.8;
         CIN1_Prevalence=0.2;
         CIN2_3_Prevalence=0.4;
         CIS_Prevalence=0.65;
