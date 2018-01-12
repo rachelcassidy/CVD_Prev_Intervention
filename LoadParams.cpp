@@ -29,6 +29,7 @@ double** HIVArray_Women;
 double** HIVArray_Men;
 double** NCDArray;
 double** CancerArray;
+double** HPVarray;
 
 // HIV Arrays
 double*** CD4_startarray;
@@ -52,7 +53,7 @@ int*      ArrayMin;
 int*      ArrayMax;
 
 // NCD Arrays
-int nr_NCDs=6;                                         // Change this as you need to
+int nr_NCDs=8;                                         // Change this as you need to
 int nr_Cancers=7;
 
 // Misc
@@ -881,7 +882,7 @@ void loadCancerArray(){
     
     // Else lets load the Array
     E(cout << "File " << &myfile << " successfully added" << endl;)
-    CancerArray = new double *[7];
+    CancerArray = new double *[nr_Cancers];
     for (int row = 0; row<7; row++){				// This loop will read in every number to the right place
         string line;
         getline(myfile, line);
@@ -900,6 +901,50 @@ void loadCancerArray(){
     
     
     E(cout << "CancerArray array has been read in successfully! " << endl;)
+}
+
+/////////////////////
+// -- HPV Array -- //
+/////////////////////
+
+void loadHPVarray(){
+    
+    E(cout << "Lets load the HPV array. " << endl;)
+    ifstream myfile("HPVarray.csv");
+    
+    
+    // Lets include an error message in case file is not found
+    if (!myfile.is_open())
+    {
+        cout << "ERROR: The file HPVarray was not found!" << endl;
+        exit(0);
+    }
+    else if (myfile.bad())
+    {
+        cout << "ERROR: The file HPVarray was bad!" << endl;
+        exit(0);
+    }
+    
+    // Else lets load the Array
+    E(cout << "File " << &myfile << " successfully added" << endl;)
+    HPVarray = new double *[3];
+    for (int row = 0; row<3; row++){                // This loop will read in every number to the right place
+        string line;
+        getline(myfile, line);
+        stringstream iss(line);
+        
+        
+        HPVarray[row]=new double[66];
+        for (int col = 0; col<66; col++){
+            string val;
+            getline (iss, val, ',');
+            stringstream convertor(val);
+            convertor >>  HPVarray[row][col];
+        }
+    }
+    
+    
+    E(cout << "HPV array has been read in successfully! " << endl;)
 }
 
 
@@ -1054,7 +1099,7 @@ void loadHIVArray_Women()
     }
     
     // Else lets load the Array
-    E(cout << "File " << &myfile3 << " successfully added" << endl;)
+    //E(cout << "File " << &myfile3 << " successfully added" << endl;)
     HIVArray_Women = new double *[201];
     for (int row = 0; row<201; row++){                    // This loop will read in every number to the right place
         string line;

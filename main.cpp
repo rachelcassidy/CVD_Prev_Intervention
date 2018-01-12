@@ -23,29 +23,42 @@
 #include "LoadParams.h"
 #include "CParamReader.hpp"
 #include "CountryParams.hpp"
+#include "Intervention.hpp"
+
 
 using namespace std;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////                                   VARIABLE PARAMETERS                                                 //////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+//// --- Control Centre --- ////
 // STEP 1 --- SELECT THE COUNTRY TO RUN THE MODEL
 // 1=KENYA      2=ZIMBABWE      3=MALAWI      4=KENYA - UG
 int country=1;
 
 // STEP 2 --- NAME THE DIRECTORY AND TAG FOR THE OUTPUT FILE
-string OutputFileDirectory="/Users/pperezgu/Dropbox/Latest.csv";
+string OutputFileDirectory="/Users/mc1405/Dropbox/KenyModel_Vacc/HIVModelZimbabwe";
+string ParamDirectory1=OutputFileDirectory + "/Kenya/";
+string ParamDirectory2=OutputFileDirectory + "/Zimbabwe/";
+string ParamDirectory3=OutputFileDirectory + "/Malawi/";;
+string ParamDirectory4=OutputFileDirectory + "/Kenya_UG/";;
 
-/// STEP 3 --- AT WHAT FACTOR SHOULD WE RUN THE POPULATION?
+// STEP 3 --- AT WHAT FACTOR SHOULD WE RUN THE POPULATION?
 int factor=100; //county = 1, country = 100
+
+// STEP 4 --- CHOOSE INTERVENTIONS DETAILS
+int yearintervention_start=2018;
+int int_HPVvaccination=1;
+
+// vaccination parameter
+int age_HPVvaccination=9;
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////                                   MODIFY IF NEEDED PARAMETERS                                        //////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 double StartYear=1950;                                                                                          //////////
 int EndYear=2035;                                                                                               //////////
-const long long int final_number_people=100000000;                                                              //////////
+const long long int final_number_people=100000000;
+
+//////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -66,10 +79,11 @@ int         init_pop;                                                           
 int         total_population;                                                                                   //////////
 double      Sex_ratio;
 double      HPV_Prevalence;
-double      CIN1_Prevalence;
-double      CIN2_3_Prevalence;
-double      CIS_Prevalence;
-double      ICC_Prevalence;
+double      HPV_Screening_coverage;
+extern double CIN1_Rates[2];
+extern double CIN2_3_Rates[2];
+extern double      CIS_Rates[2];
+extern double      ICC_Rates[2];
 double      no_hpv_infection;
 double      HPV_Status_HPV;
 double      HPV_Status_CIN1;
@@ -81,6 +95,8 @@ double      hpv_date_after_death;
 
 
 int         ageAdult;                                                                                           //////////
+int         age_atrisk_hpv;
+int         age_tostart_CCscreening;
 double      ARTbuffer;                                                                                          //////////
 double      MortAdj;                                                                                            //////////
 int         ART_start_yr;                                                                                       //////////
@@ -179,6 +195,7 @@ int main(){
     loadHIVArray_Men();
     loadNCDArray();
     loadCancerArray();
+    loadHPVarray();
     
     
     
@@ -196,7 +213,7 @@ int main(){
     double GlobalTime=StartYear;											// Define Global Time and set it to 0 at the beginning of the model
     p_GT=&GlobalTime;														// Define the location the pointer to Global time is pointing to
     
-    priority_queue<event*, vector<event*>, timeComparison> iQ;				// Define th ePriority Q
+    priority_queue<event*, vector<event*>, timeComparison> iQ;				// Define the Priority Q
     p_PQ=&iQ;																// Define pointer to event Q
     p_PY=&PY;
     cout << p_PY << endl;
@@ -230,14 +247,29 @@ int main(){
     
     
     //// --- EVENTQ --- ////
-    cout << "Section 5 - We are going to create the annual events" << endl;
+    cout << "Section 5 - We are going to create key events" << endl;
     
     event * TellNewYear = new event;										// --- Tell me every time  a new year start ---
     Events.push_back(TellNewYear);
     TellNewYear->time = StartYear;
     TellNewYear->p_fun = &EventTellNewYear;
     iQ.push(TellNewYear);
+    
+    event * InterventionEvent = new event;
+    Events.push_back(InterventionEvent);
+    InterventionEvent->time = yearintervention_start;
+    InterventionEvent->p_fun = &EventStartIntervention;
+    iQ.push(InterventionEvent);
+    
+    
 
+    /// --- Screen all women who start ART for Cervical Cancer each year --- ///
+    event * CC_First_screen = new event;
+    Events.push_back(CC_First_screen);
+    CC_First_screen->time = 2018;
+    CC_First_screen->p_fun = &EventMyFirst_VIA_Screening;
+    iQ.push(CC_First_screen);
+    //p_PQ->push(CC_First_screen);
     
     //// --- LETS RUN THE EVENTQ --- ////
     cout << endl << endl << "The characteristics of the event queue:" << endl;
@@ -257,8 +289,8 @@ int main(){
     
     
     
-    for (int i=0; i<total_population; i++) {								// Note: If adding more variables to be output, need to adapt the %x
-        fprintf(ProjectZim,"%d, %d, %f, %f, %d, %d, %f, %d, %f, %d, %d, %f, %f, %f, %f, %f, %d, %f, %f, %f, %f, %f, %f, %f, %d, %f, %f, %f, %f, %f, %f, %f, %f, %d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f \n",
+   /* for (int i=0; i<total_population; i++) {								// Note: If adding more variables to be output, need to adapt the %x
+        fprintf(ProjectZim,"%d, %d, %f, %f, %d, %d, %f, %d, %f, %d, %d, %f, %f, %f, %f, %f, %d, %f, %f, %f, %f, %f, %f, %f, %d, %f, %f, %f, %f, %f, %f, %f, %f, %d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %d, %d \n",
                 MyArrayOfPointersToPeople[i]->PersonID,
                 MyArrayOfPointersToPeople[i]->Sex,
                 MyArrayOfPointersToPeople[i]->DoB,
@@ -295,16 +327,19 @@ int main(){
                 MyArrayOfPointersToPeople[i]->Stroke_status,             // Check if used and, if not, remove
                 MyArrayOfPointersToPeople[i]->HPV_Status,
                 MyArrayOfPointersToPeople[i]->HPV_DateofInfection,
-                MyArrayOfPointersToPeople[i]->CIN1_DateofInfection,
-                MyArrayOfPointersToPeople[i]->CIN2_3_DateofInfection,
-                MyArrayOfPointersToPeople[i]->CIS_DateofInfection,
+                MyArrayOfPointersToPeople[i]->CIN1_DateofProgression,
+                MyArrayOfPointersToPeople[i]->CIN2_3_DateofProgression,
+                MyArrayOfPointersToPeople[i]->CIS_DateofProgression,
                 MyArrayOfPointersToPeople[i]->ICC_DateofInfection,
                 MyArrayOfPointersToPeople[i]->HPV_DateofRecovery,
                 MyArrayOfPointersToPeople[i]->CIN1_DateofRecovery,
                 MyArrayOfPointersToPeople[i]->CIN2_3_DateofRecovery,
-                MyArrayOfPointersToPeople[i]->CIS_DateofRecovery
+                MyArrayOfPointersToPeople[i]->CIS_DateofRecovery,
+                MyArrayOfPointersToPeople[i]->MI,
+                MyArrayOfPointersToPeople[i]->HC
+                
                 );}
-    fclose(ProjectZim);
+    fclose(ProjectZim);*/
     
     // COUNT OUTPUT FOR FITTING
     int count_2016deaths=0;
@@ -336,9 +371,9 @@ int main(){
     double OtherCan_m   =(count_causeofdeath[12]/(double)count_2016deaths)*100;
     double HPV_Status_m        =(count_causeofdeath[13]/(double)count_2016deaths)*100;
     double HPV_DateofInfection_m        =(count_causeofdeath[13]/(double)count_2016deaths)*100;
-    double CIN1_DateofInfection_m        =(count_causeofdeath[13]/(double)count_2016deaths)*100;
-    double CIN2_3_DateofInfection_m        =(count_causeofdeath[13]/(double)count_2016deaths)*100;
-    double CIS_DateofInfection_m        =(count_causeofdeath[13]/(double)count_2016deaths)*100;
+    double CIN1_DateofProgression_m        =(count_causeofdeath[13]/(double)count_2016deaths)*100;
+    double CIN2_3_DateofProgression_m        =(count_causeofdeath[13]/(double)count_2016deaths)*100;
+    double CIS_DateofProgression_m        =(count_causeofdeath[13]/(double)count_2016deaths)*100;
     double ICC_DateofInfection_m        =(count_causeofdeath[13]/(double)count_2016deaths)*100;
     double HPV_DateofRecovery_m        =(count_causeofdeath[13]/(double)count_2016deaths)*100;
     double CIN1_DateofRecovery_m        =(count_causeofdeath[13]/(double)count_2016deaths)*100;
@@ -361,9 +396,9 @@ int main(){
     cout << "OtherCan "   << OtherCan_m << endl;
     cout << "HPV_Status_m "        << HPV_Status_m << endl;
     cout << "HPV_DateofInfection "        << HPV_DateofInfection_m << endl;
-    cout << "CIN1_DateofInfection "        << CIN1_DateofInfection_m << endl;
-    cout << "CIN2_3_DateofInfection "        << CIN2_3_DateofInfection_m << endl;
-    cout << "CIS_DateofInfection "        << CIS_DateofInfection_m << endl;
+    cout << "CIN1_DateofProgression "        << CIN1_DateofProgression_m << endl;
+    cout << "CIN2_3_DateofProgression "        << CIN2_3_DateofProgression_m << endl;
+    cout << "CIS_DateofProgression "        << CIS_DateofProgression_m << endl;
     cout << "ICC_DateofInfection "        << ICC_DateofInfection_m << endl;
     cout << "HPV_DateofRecovery "        << HPV_DateofRecovery_m << endl;
     cout << "CIN1_DateofRecovery "        << CIN1_DateofRecovery_m << endl;

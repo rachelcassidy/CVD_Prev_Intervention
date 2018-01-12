@@ -20,6 +20,7 @@ void loadHIVArray_Men();
 
 void loadNCDArray();
 void loadCancerArray();
+void loadHPVarray();
 
 
 //// --- Shorter Parameter Arrays from txt file --- ////

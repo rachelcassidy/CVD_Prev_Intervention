@@ -31,11 +31,13 @@ extern          vector<event*> Events;
 extern double   Sex_ratio;
 
 extern double   HPV_Prevalence;
-extern double   CIN1_Prevalence;
-extern double   CIN2_3_Prevalence;
-extern double   CIS_Prevalence;
-extern double   ICC_Prevalence;
+extern double   HPV_Screening_coverage;
 extern int HPV_Status_HPV;
+extern int CC_Screening_Count;
+extern int CC_ScreenOutcome;
+extern int CC_CryoOutcome;
+extern double Re_ScreenOn;
+extern double Re_ScreenOn;
 extern int HPV_Status_CIN1;
 extern int HPV_Status_CIN2_3;
 extern int HPV_Status_CIS;
@@ -43,6 +45,8 @@ extern int HPV_Status_ICC;
 extern int HPV_Status_Recovered;
 extern double hpv_date_after_death;
 extern double no_hpv_infection;
+extern int age_atrisk_hpv;
+extern int age_tostart_CCscreening;
 
 //// --- POINTERS TO EXTERNAL ARRAYS --- ////
 extern double** BirthArray;							 	
@@ -62,6 +66,7 @@ extern int*     NCDAgeArrayMax;
 extern double** CancerArray;
 extern int*     CancerAgeArrayMin;
 extern int*     CancerAgeArrayMax;
+extern double** HPVarray;
 
 extern double   MortAdj;
 
@@ -90,7 +95,7 @@ person::person()											// First 'person' class second constructor/variable a
     DatesBirthALL.resize(0);                                // This will be used to push in all births of every child - even those that happen after death
     
     DateOfDeath=9999;										// --- Varibles related to death ---
-    CauseOfDeath=-999;                                      // 1=other, 2=HIV, 3=IHD, 4=depression, 5=Asthma, 6=Stroke, 7=Diabetes, 8=CKD, 9=breast, 10-cervical, 11-colo, 12-Liver, 13-oeso, 14=prostate, 15=other
+    CauseOfDeath=-999;                                      // 1=other, 2=HIV, 3=IHD, 4=depression, 5=Asthma, 6=Stroke/MI, 7=Diabetes, 8=CKD, 9=breast, 10-cervical, 11-colo, 12-Liver, 13-oeso, 14=prostate, 15=other
     AgeAtDeath=-999;
     Alive=-999;
     
@@ -98,15 +103,22 @@ person::person()											// First 'person' class second constructor/variable a
     
     HPV_Status=-999;
     HPV_DateofInfection=-999;
-    CIN1_DateofInfection=-999;
-    CIN2_3_DateofInfection=-999;
-    CIS_DateofInfection=-999;
+    CIN1_DateofProgression=-999;
+    CIN2_3_DateofProgression=-999;
+    CIS_DateofProgression=-999;
     ICC_DateofInfection=-999;
     HPV_DateofRecovery=-999;
     CIN1_DateofRecovery=-999;
     CIN2_3_DateofRecovery=-999;
     CIS_DateofRecovery=-999;
+    CC_Screening_Count=0;
+    CC_ScreenOutcome=-999;
+    CC_CryoOutcome=-999;
+    Re_ScreenOn=-999;
     
+    HPVvaccination_status=0;
+    HPVvaccination_date=-999;
+
     CD4_cat_start=-999;                                     // CD4 at HIV infection
     CD4_cat_ARTstart=-999;
     CD4_cat=-999;											// Where 0=>500, 1=350-500, 2=250-350, 3=200-250, 4=100-200, 5=50-100, and 6=<50
@@ -114,9 +126,11 @@ person::person()											// First 'person' class second constructor/variable a
     ART=-999;												// Where HIV and ART 0=No and 1=Yes
     
     HT=-999;                                                // --- Variables related to NCDs ---
+    HC=-999;
     Depression=-999;
     Asthma=-999;
     Stroke=-999;
+    MI=-999;
     Diabetes=-999;
     CKD=-999;
     
@@ -129,9 +143,11 @@ person::person()											// First 'person' class second constructor/variable a
     OtherCan=-999;
     
     HT_status=0;
+    HC_status=0;
     Depression_status=0;
     Asthma_status=0;
     Stroke_status=0;
+    MI_status=0;
     Diabetes_status=0;
     CKD_status=0;
     
@@ -354,52 +370,42 @@ void person::GetMyDoBNewEntry(){							// --- Assign Age for New Entry ---
 };
 
 
-//// --- FUNCTIONS RELATED TO HPV --- ////
-///////////////////////////////////////////   STAGE 1 /////////////////////////////////////////////
+//// --- FUNCTION TO ASSIGN HPV --- ////
 void person::GetMyDateOfHPVInfection(){
     
-    if(DoB>=1900 && Alive==1 && Sex==2){
+    E(cout << endl << endl << "We're assigning HPV infection" << endl);
+    
+    double age_at_death=DateOfDeath-DoB;
+    
+    if(HPV_DateofInfection==-999 && Sex==2 && age_at_death<age_atrisk_hpv)
+    {
+        HPV_DateofInfection=-990;                                       // -990 in case they die before reaching age at risk for HPV infection
+    }
+    
+    else if(HPV_DateofInfection==-999 && age_at_death>=age_atrisk_hpv && Sex==2)
+    {
         
-        int year = floor(*p_GT);
-        double months = floor(((1-(*p_GT-year+0.01))*12));
-        double fractionyear = 1-(*p_GT-year);
+        double TestHPVDate=-997;
+        double h = ((double) rand() / (RAND_MAX));
+
+        if (h>HPVarray[2][65]){HPV_DateofInfection=-988;              // -988 in case they do NOT get HPV ever
+            //cout << PersonID << " drew a risk for HPV infection of " << h << ". Therefore " << TestHPVDate << endl;
+        }
         
-        
-        if(HPV_DateofInfection==-999){
+        if (h<=HPVarray[2][65]){                                      // In case they DO get HPV in their life
             
-            int j=0;
-            std::random_device rd;
-            std::mt19937 gen{rd()};
-            std::uniform_int_distribution<> dis{15, 65};
-            j = dis(gen);
+            int i=0;
+            while (h>HPVarray[2][i]){i++;}
             
-            float TestHPVDate=0;
-            double YearFraction=-999;
-            if(months>=1){YearFraction=(RandomMinMax(0,months))/12.1;}            // This gets month of birth as a fraction of a year
-            if(months<1){YearFraction=0;}
-            double    h = ((double)rand() / (RAND_MAX));                // Get a random number between 0 and 1.  NB/ THIS SHOULD HAVE A PRECISION OF 15 decimals which should be enough but lets be careful!!
-            if (h>HPV_Prevalence){HPV_DateofInfection=-988;}                // In case they do NOT get HPV ever
-            if (h<=HPV_Prevalence){                        // In case they DO get HPV in their life
-                    TestHPVDate=(DoB+j)+YearFraction;
-                    if (TestHPVDate<DateOfDeath){HPV_DateofInfection=TestHPVDate;}
-                    if (TestHPVDate>=DateOfDeath) {HPV_DateofInfection=-977;}
-   //                 if (TestHPVDate<1950) {HPV_DateofInfection=-978;}   //This is just so the MATLAB code works - we're only interested from 1950 onwards
-                }
-          
-            
-            
-           // cout << "Probability for HPV of " << PersonID << ", born in " << DoB << " is " << h << ", and infection occurred at age " << TestHPVDate-DoB << ". The infection occurred " << DateOfDeath-TestHPVDate << " years before here death." << endl;
-            
-            
-            
-            // Error message:
-            if (months>12){cout << "Error 2: There is an error and HPV infection will ocurr in the wrong year: " << months << endl;}
-            if (YearFraction>fractionyear){cout << "Error 2: There is an error!" << YearFraction << " and fraction " << fractionyear<< endl;cout << "Global Time "<< *p_GT << " and months " << months << endl;}
-            if(YearFraction==-999){cout << "Error 3: Yearfraction hasn't been initialised" << months << endl;}
-       }
-        
-        //// --- Lets feed HPV infection into the eventQ --- ////
-        if (HPV_DateofInfection>=*p_GT && HPV_DateofInfection<EndYear){
+            double YearFraction=(RandomMinMax(1,12))/ 12.1;             // Get a random month as a fraction of a year
+            TestHPVDate = DoB+i+YearFraction;                           // Get the date of HPV infection
+            HPV_DateofInfection=TestHPVDate;
+        //cout << PersonID << " drew a risk for HPV infection of " << h << ". She developed HPV infection in " << TestHPVDate << ", aged " << TestHPVDate-DoB << endl;
+        }
+    }
+    
+    //// --- Lets feed HPV infection into the eventQ --- ////
+    if (HPV_DateofInfection>=*p_GT && HPV_DateofInfection<EndYear){
             int p=PersonID-1;
             event * HPV_DateofInfectionEvent = new event;
             Events.push_back(HPV_DateofInfectionEvent);
@@ -408,16 +414,9 @@ void person::GetMyDateOfHPVInfection(){
             HPV_DateofInfectionEvent->person_ID = MyArrayOfPointersToPeople[p];
             p_PQ->push(HPV_DateofInfectionEvent);
         }
-    } 
-
-    //// --- Some warning code - just in case ... --- ////
-    E(if (HPV_DateofInfection>-977 && DoB>1900){
-        cout << endl <<  "This DIDNT WORK!! WARNING!! "<< endl;
-        cout << "HPV: " << HPV_DateofInfection << " (Alive: " << Alive << " and Date of Death: " << DateOfDeath << ")" << endl;
-        cout << "Size reservoir: " << HPVReservoir.size() << endl << endl;
-    })
     
-};
+}
+
 
 
 //// --- FUNCTIONS RELATED TO HIV --- ////
@@ -455,7 +454,7 @@ void person::GetMyDateOfHIVInfection(){
                     if (TestHIVDate<1975) {HIV=-989;}
                 }
             }
-            
+        
             else if (Sex==2){
                 if (h>HIVArray_Women[i][120]){HIV=-988;}                // In case they do NOT get HIV ever
                 if (h<=HIVArray_Women[i][120]){                        // In case they DO get HIV in their life
@@ -501,7 +500,9 @@ void person::GetMyDateOfHIVInfection(){
         cout << "Size reservoir: " << HIVReservoir.size() << endl << endl;
     })
     
-};
+}
+
+
 
 
 // --- Assign NCD  ---
@@ -535,6 +536,8 @@ void person::GetMyDateNCD(){
                 else if (ncd==3)    {Stroke=-998;}
                 else if (ncd==4)    {Diabetes=-998;}
                 else if (ncd==5)    {CKD=-998;}
+                else if (ncd==6)    {MI=-998;}
+                else if (ncd==7)    {HC=-998;}
                 DateNCD=-998;
             }
             
@@ -572,7 +575,7 @@ void person::GetMyDateNCD(){
                 else if (ncd==1)
                 {
                     Depression=DateNCD;
-                    //// --- Lets feed Hypercholesterolaemia into the eventQ --- ////
+                    //// --- Lets feed depression into the eventQ --- ////
                     if (Depression>=*p_GT && Depression<EndYear){
                         int p=PersonID-1;
                         event * DepressionEvent = new event;
@@ -588,7 +591,7 @@ void person::GetMyDateNCD(){
                 else if (ncd==2)
                 {
                     Asthma=DateNCD;
-                    //// --- Lets feed Hypertension into the eventQ --- ////
+                    //// --- Lets feed asthma into the eventQ --- ////
                     if (Asthma>=*p_GT && Asthma<EndYear){
                         int p=PersonID-1;
                         event * AsthmaEvent = new event;
@@ -645,7 +648,40 @@ void person::GetMyDateNCD(){
                         p_PQ->push(CKDEvent);
                     }
                 }
+                
+                else if (ncd==6)
+                {
+                    MI=DateNCD;
+                    //// --- Lets feed MI into the eventQ --- ////
+                    if (MI>=*p_GT && MI<EndYear){
+                        int p=PersonID-1;
+                        event * MIEvent = new event;
+                        Events.push_back(MIEvent);
+                        MIEvent->time = MI;
+                        MIEvent->p_fun = &EventMyMIDate;
+                        MIEvent->person_ID = MyArrayOfPointersToPeople[p];
+                        p_PQ->push(MIEvent);
+                    }
+                }
+                
+                if (ncd==7)
+                {
+                    HC=DateNCD;
+                    //// --- Lets feed Hypertension into the eventQ --- ////
+                    if (HC>=*p_GT && HC<EndYear){
+                        int p=PersonID-1;
+                        event * HCEvent = new event;
+                        Events.push_back(HCEvent);
+                        HCEvent->time = HC;
+                        HCEvent->p_fun = &EventMyHypcholDate;
+                        HCEvent->person_ID = MyArrayOfPointersToPeople[p];
+                        p_PQ->push(HCEvent);
+                    }
+                    //cout << "Date HT " << DateNCD << " or " << HT << endl;
+                }
+
             }
+            
             
             NCD_DatesVector.push_back(DateNCD);
             ncd++;                                                 // Lets do the next NCD
