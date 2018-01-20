@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <ctime>
-#include <math.h>                                                          
+#include <math.h>
 #include <vector>
 #include <random>
 #include <cmath>
@@ -22,6 +22,7 @@
 #include "CParamReader.hpp"
 #include "LoadParams.h"
 #include "CountryParams.hpp"
+#include "Intervention.hpp"
 
 using namespace std;
 
@@ -107,7 +108,7 @@ double MortRisk[6]= {0, 0, 0.85, 1.3, 1.1, 0.8}; //{0.087, 0, 1.4, 670.87, 12.23
 double MortRisk_Cancer[5]= {1, 1, 1, 1, 1.05};                   //{0.087, 0, 1.4, 670.87, 12.23};   // Both this and above needs to be fitted
 extern double MortAdj;
 extern double ARTbuffer;
- 
+
 
 /// HIV Increased risk for NCD Parameter ///
 double Risk_HIVHT=1.49;                                       // Increased risk of HT given HIV (and CKD given HIV below) - from Schouten et al CID 2016
@@ -160,6 +161,11 @@ int Elig_Men=0;
 int Elig_Women=0;
 int Elig_Kids=0;
 
+// Vaccination variables
+extern int age_HPVvaccination;
+extern int int_HPVvaccination;
+extern int yearintervention_start;
+
 
 
 //////////////////////////////////////
@@ -184,7 +190,7 @@ void EventTellNewYear(person *MyPointerToPerson){
             
             
             if (count_ARTKids<ARTKids[ART_index] ){
-               
+                
                 int a=(RandomMinMax_2(1,countKIDSHIVRef-1));    // Get a random person and update age
                 int i=KIDS_HIV_Ref_PersonID[a]-1;
                 //cout << "totalpopulation " << total_population << " a " << a <<  " Kids ref " << KIDS_HIV_Ref_PersonID[a] << endl;
@@ -244,7 +250,7 @@ void EventTellNewYear(person *MyPointerToPerson){
                         Elig_Women=Elig_Women-1;
                         
                         //cout << MyArrayOfPointersToPeople[i]->PersonID << " has an ART start date of " << MyArrayOfPointersToPeople[i]->ART << endl;
-                       
+                        
                     }
                     
                 }
@@ -252,9 +258,9 @@ void EventTellNewYear(person *MyPointerToPerson){
             
         }
         
-//        cout << endl << " we have finished assigning ART KIDS: There have " << Elig_Kids << " eligible kids and we need to reach " << ARTKids[ART_index] << " and only have " << count_ARTKids   << endl;
-//        cout << "Men: There have " << Elig_Men << " eligible men and we need to reach " << ARTMen_sum[ART_index] << " and only have " << count_ARTMen_sum << " times 20% " << 1.2*count_ARTMen_sum << endl;
-//        cout << "Women: There have " << Elig_Women << " eligible women and we need to reach " << ARTWomen_sum[ART_index] << " and only have " << count_ARTWomen_sum << " times 20% " << 1.2*count_ARTWomen_sum<< endl;
+        //        cout << endl << " we have finished assigning ART KIDS: There have " << Elig_Kids << " eligible kids and we need to reach " << ARTKids[ART_index] << " and only have " << count_ARTKids   << endl;
+        //        cout << "Men: There have " << Elig_Men << " eligible men and we need to reach " << ARTMen_sum[ART_index] << " and only have " << count_ARTMen_sum << " times 20% " << 1.2*count_ARTMen_sum << endl;
+        //        cout << "Women: There have " << Elig_Women << " eligible women and we need to reach " << ARTWomen_sum[ART_index] << " and only have " << count_ARTWomen_sum << " times 20% " << 1.2*count_ARTWomen_sum<< endl;
         
         // Lets update the ART index
         ART_index++;
@@ -409,13 +415,28 @@ void EventBirth(person *MyPointerToPerson){
         (MyArrayOfPointersToPeople[total_population-1])->GetMyDateCancers();
         (MyArrayOfPointersToPeople[total_population-1])->GetMyDateOfHPVInfection();
         (MyArrayOfPointersToPeople[total_population-1])->GetMyDateOfHIVInfection();
-    
+        
         
         
         // Link Mother and Child
         (MyArrayOfPointersToPeople[total_population-1])->MotherID=MyPointerToPerson->PersonID;			// Give child their mothers ID
         MyPointerToPerson->ChildIDVector.push_back((MyArrayOfPointersToPeople[total_population-1]));	// Give mothers their child's ID
-    
+        
+        
+        // This code is for the HOV vaccination Intervention
+        if (*p_GT>=(yearintervention_start-age_HPVvaccination) && int_HPVvaccination==1)
+        {
+            
+            event * HPV_VaccinationEvent = new event;
+            Events.push_back(HPV_VaccinationEvent);
+            HPV_VaccinationEvent->time = MyArrayOfPointersToPeople[total_population-1]->DoB + age_HPVvaccination;
+            HPV_VaccinationEvent->p_fun = &EventMyHPVVaccination;
+            HPV_VaccinationEvent->person_ID = MyArrayOfPointersToPeople[total_population-1];
+            p_PQ->push(HPV_VaccinationEvent);
+            
+            
+        }
+        
         E(cout << "We have finished giving birth " << endl;)					// Error message - can be switched on/off
         
     }
@@ -425,11 +446,11 @@ void EventBirth(person *MyPointerToPerson){
 //// --- HPV EVENT --- ////
 
 void EventMyHPVInfection(person *MyPointerToPerson){                    // Function executed when somebody develops HPV infection
-
+    
     E(cout << "Somebody just got infected with HPV and will either progress to CIN1 or recover: " << endl;)
     
-    if(MyPointerToPerson->Alive == 1 && MyPointerToPerson->HPV_Status<1){                                  // Only execute this function if the person is still alive
-        MyPointerToPerson->Age= (*p_GT - MyPointerToPerson->DoB);       // Update age to get correct parameter below
+    if(MyPointerToPerson->Alive == 1 && MyPointerToPerson->HPV_Status<1 && MyPointerToPerson->HPVvaccination_status==0){                                  // Only execute this function if the person is still alive
+        MyPointerToPerson->Age= (*p_GT - MyPointerToPerson->DoB);       // Update age to get correct parameter belowhp
         
         if (MyPointerToPerson->HPV_DateofInfection>0){
             MyPointerToPerson->HPV_Status=HPV_Status_HPV;
@@ -469,8 +490,8 @@ void EventMyHPVInfection(person *MyPointerToPerson){                    // Funct
             
             //// In case they progress to CIN1
             if (h<=CIN1_Rates[1]){
-                 if (TestCIN1Date<MyPointerToPerson->DateOfDeath){MyPointerToPerson->CIN1_DateofProgression=TestCIN1Date;}{MyPointerToPerson->HPV_DateofRecovery=-977;}
-                 if (TestCIN1Date>=MyPointerToPerson->DateOfDeath) {MyPointerToPerson->CIN1_DateofProgression=hpv_date_after_death;}
+                if (TestCIN1Date<MyPointerToPerson->DateOfDeath){MyPointerToPerson->CIN1_DateofProgression=TestCIN1Date;}{MyPointerToPerson->HPV_DateofRecovery=-977;}
+                if (TestCIN1Date>=MyPointerToPerson->DateOfDeath) {MyPointerToPerson->CIN1_DateofProgression=hpv_date_after_death;}
                 
                 //// Let's push progression into the events Q
                 event * CIN1_DateofProgressionEvent = new event;
@@ -528,7 +549,7 @@ void EventMyCIN1Status(person *MyPointerToPerson){
                 
                 //cout << MyPointerToPerson << " got infected with HPV on " << MyPointerToPerson->HPV_DateofInfection << " and progressed to CIN1 on " << MyPointerToPerson->CIN1_DateofProgression << ". Given H = " << h << ", she recovered from CIN1 on " << MyPointerToPerson->CIN1_DateofRecovery << " (" << MyPointerToPerson->CIN2_3_DateofProgression << ")" << endl;
             }
-
+            
             //// In case they progress to CIN2/3
             if (h<=CIN2_3_Rates[1]){
                 if (TestCIN2_3Date<MyPointerToPerson->DateOfDeath){MyPointerToPerson->CIN2_3_DateofProgression=TestCIN2_3Date;}{MyPointerToPerson->CIN1_DateofRecovery=-977;}
@@ -881,7 +902,7 @@ void EventMyHIVInfection(person *MyPointerToPerson){
             {
                 int i=0;
                 while (r>HPVarray[1][i]){i++;
-            }
+                }
                 double YearFraction=(RandomMinMax_2(1,12))/ 12.1;
                 ReTestHPVDate=MyPointerToPerson->DoB+i+YearFraction;
                 
@@ -891,13 +912,13 @@ void EventMyHIVInfection(person *MyPointerToPerson){
                 {
                     MyPointerToPerson->HPV_DateofInfection=ReTestHPVDate;    // The newly assigned date of infection replaces the old one
                     
-                        int p=MyPointerToPerson->PersonID-1;
-                        event * HPV_DateofInfectionEvent = new event;
-                        Events.push_back(HPV_DateofInfectionEvent);
-                        HPV_DateofInfectionEvent->time = MyPointerToPerson->HPV_DateofInfection;
-                        HPV_DateofInfectionEvent->p_fun = &EventMyHPVInfection;
-                        HPV_DateofInfectionEvent->person_ID = MyArrayOfPointersToPeople[p];
-                        p_PQ->push(HPV_DateofInfectionEvent);
+                    int p=MyPointerToPerson->PersonID-1;
+                    event * HPV_DateofInfectionEvent = new event;
+                    Events.push_back(HPV_DateofInfectionEvent);
+                    HPV_DateofInfectionEvent->time = MyPointerToPerson->HPV_DateofInfection;
+                    HPV_DateofInfectionEvent->p_fun = &EventMyHPVInfection;
+                    HPV_DateofInfectionEvent->person_ID = MyArrayOfPointersToPeople[p];
+                    p_PQ->push(HPV_DateofInfectionEvent);
                 }
             }
         }
@@ -947,7 +968,7 @@ void EventMyFirst_VIA_Screening(person *MyPointerToPerson){
                 DateOfSecondScreening->p_fun = &EventMy_VIA_FollowUp;
                 DateOfSecondScreening->person_ID = MyArrayOfPointersToPeople[p];
                 p_PQ->push(DateOfSecondScreening);
-
+                
             }
             
             // --- A woman with CIN1 is about to be screened
@@ -1228,8 +1249,8 @@ void EventMyStrokeDate(person *MyPointerToPerson)			    // Function executed whe
     if(MyPointerToPerson->Alive == 1 && MyPointerToPerson->Stroke_status==0) {
         
         MyPointerToPerson->Stroke_status=1;
-    
-    
+        
+        
         // Lets see if we need to update death date
         int ncd_index=3;
         int error=0;
@@ -1237,7 +1258,7 @@ void EventMyStrokeDate(person *MyPointerToPerson)			    // Function executed whe
         int j=0;												// This will be matched to probability taken from random number generator
         double	d = ((double) rand() / (RAND_MAX)) ;			// get a random number to determine Life Expectancy
         double TestDeathDate;
-
+        
         
         // Lets see if they die within the year                 REFERENCE: http://stroke.ahajournals.org/content/32/9/2131.full
         double p_mort=((double) rand () / (RAND_MAX));
@@ -1247,7 +1268,7 @@ void EventMyStrokeDate(person *MyPointerToPerson)			    // Function executed whe
             double YearFraction=(RandomMinMax_2(1,12))/12.1;     // See when during this year this person will die
             TestDeathDate=*p_GT + YearFraction;
         }
-
+        
         // Lets see if they die earlier
         if (p_mort>=0.6)
         {
@@ -1255,7 +1276,7 @@ void EventMyStrokeDate(person *MyPointerToPerson)			    // Function executed whe
                 while(d>DeathArray_Men[k][j]*MortRisk[ncd_index] && j<121){j++;}
                 TestDeathDate=(MyPointerToPerson->DoB+j);
             }
-        
+            
             if (MyPointerToPerson->Sex==2) {
                 while(d>DeathArray_Women[k][j]*MortRisk[ncd_index] && j<121){j++;}
                 TestDeathDate=(MyPointerToPerson->DoB+j);
@@ -1410,7 +1431,7 @@ void EventMyDiabetesDate(person *MyPointerToPerson){
             double r = ((double) rand() / (RAND_MAX));
             
             // If we are getting an NCD lets get the age and date of NCD
-          
+            
             if (r<NCDArray[relatedNCDs_Diab[ncd_nr]][120]*Risk_NCD_Diabetes[ncd_nr])
             {
                 // Lets get the index for age at NCD
@@ -1502,7 +1523,7 @@ void EventMyDiabetesDate(person *MyPointerToPerson){
                     HCEvent->person_ID = MyArrayOfPointersToPeople[p];
                     p_PQ->push(HCEvent);
                 }
-
+                
                 
             }
             
@@ -1645,7 +1666,7 @@ void EventMyHyptenDate(person *MyPointerToPerson)			// Function executed when pe
     E(cout << endl << endl << "Hypercholesterolaemia has developed and addition risks evaluated!" << endl;)
 }
 
-void EventMyHypcholDate(person *MyPointerToPerson)			// Function executed when person develops hypercholesterolaemia 
+void EventMyHypcholDate(person *MyPointerToPerson)			// Function executed when person develops hypercholesterolaemia
 {
     E(cout << "I just developed Hypercholesterol, lets see if I am at an increased risk of other NCDs!" << endl;)
     

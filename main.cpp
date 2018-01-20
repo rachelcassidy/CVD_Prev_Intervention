@@ -23,29 +23,42 @@
 #include "LoadParams.h"
 #include "CParamReader.hpp"
 #include "CountryParams.hpp"
+#include "Intervention.hpp"
+
 
 using namespace std;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////                                   VARIABLE PARAMETERS                                                 //////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+//// --- Control Centre --- ////
 // STEP 1 --- SELECT THE COUNTRY TO RUN THE MODEL
 // 1=KENYA      2=ZIMBABWE      3=MALAWI      4=KENYA - UG
 int country=1;
 
 // STEP 2 --- NAME THE DIRECTORY AND TAG FOR THE OUTPUT FILE
-string OutputFileDirectory="/Users/Monkeyface/Dropbox/Ageing in Kenya and Zimbabwe - project/Model_wHPV/MATLAB_Pablo copy/Latest.csv";
+string OutputFileDirectory="/Users/mc1405/Dropbox/KenyModel_Vacc/HIVModelZimbabwe";
+string ParamDirectory1=OutputFileDirectory + "/Kenya/";
+string ParamDirectory2=OutputFileDirectory + "/Zimbabwe/";
+string ParamDirectory3=OutputFileDirectory + "/Malawi/";;
+string ParamDirectory4=OutputFileDirectory + "/Kenya_UG/";;
 
-/// STEP 3 --- AT WHAT FACTOR SHOULD WE RUN THE POPULATION?
+// STEP 3 --- AT WHAT FACTOR SHOULD WE RUN THE POPULATION?
 int factor=100; //county = 1, country = 100
+
+// STEP 4 --- CHOOSE INTERVENTIONS DETAILS
+int yearintervention_start=2018;
+int int_HPVvaccination=1;
+
+// vaccination parameter
+int age_HPVvaccination=9;
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////                                   MODIFY IF NEEDED PARAMETERS                                        //////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 double StartYear=1950;                                                                                          //////////
 int EndYear=2035;                                                                                               //////////
-const long long int final_number_people=100000000;                                                              //////////
+const long long int final_number_people=100000000;
+
+//////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -148,8 +161,8 @@ int main(){
     cout << "Model calibrated to: 1) Run at a " << factor << "th of the population (N=" << init_pop << "); 2) Adult = "
     << ageAdult << " years of age on; 3) Mortality adjustment = "
     << MortAdj << "; 4) ART buffer = " << ARTbuffer << "; 5) ART was introduced in " << ART_start_yr << endl << endl;
-
-
+    
+    
     
     
     //// --- Load parameters --- ////
@@ -204,7 +217,7 @@ int main(){
     p_PQ=&iQ;																// Define pointer to event Q
     p_PY=&PY;
     cout << p_PY << endl;
-
+    
     
     //// --- MAKING POPULATION--- ////
     
@@ -234,14 +247,22 @@ int main(){
     
     
     //// --- EVENTQ --- ////
-    cout << "Section 5 - We are going to create the annual events" << endl;
+    cout << "Section 5 - We are going to create key events" << endl;
     
     event * TellNewYear = new event;										// --- Tell me every time  a new year start ---
     Events.push_back(TellNewYear);
     TellNewYear->time = StartYear;
     TellNewYear->p_fun = &EventTellNewYear;
     iQ.push(TellNewYear);
-
+    
+    event * InterventionEvent = new event;
+    Events.push_back(InterventionEvent);
+    InterventionEvent->time = yearintervention_start;
+    InterventionEvent->p_fun = &EventStartIntervention;
+    iQ.push(InterventionEvent);
+    
+    
+    
     /// --- Screen all women who start ART for Cervical Cancer each year --- ///
     event * CC_First_screen = new event;
     Events.push_back(CC_First_screen);
@@ -268,56 +289,57 @@ int main(){
     
     
     
-    for (int i=0; i<total_population; i++) {								// Note: If adding more variables to be output, need to adapt the %x
-        fprintf(ProjectZim,"%d, %d, %f, %f, %d, %d, %f, %d, %f, %d, %d, %f, %f, %f, %f, %f, %d, %f, %f, %f, %f, %f, %f, %f, %d, %f, %f, %f, %f, %f, %f, %f, %f, %d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %d, &d \n",
-                MyArrayOfPointersToPeople[i]->PersonID,
-                MyArrayOfPointersToPeople[i]->Sex,
-                MyArrayOfPointersToPeople[i]->DoB,
-                MyArrayOfPointersToPeople[i]->Age,
-                MyArrayOfPointersToPeople[i]->MotherID,
-                MyArrayOfPointersToPeople[i]->DatesBirth.size(),
-                MyArrayOfPointersToPeople[i]->DateOfDeath,
-                MyArrayOfPointersToPeople[i]->AgeAtDeath,
-                MyArrayOfPointersToPeople[i]->HIV,
-                MyArrayOfPointersToPeople[i]->CD4_cat,
-                MyArrayOfPointersToPeople[i]->ART,
-                MyArrayOfPointersToPeople[i]->HT,
-                MyArrayOfPointersToPeople[i]->Depression,
-                MyArrayOfPointersToPeople[i]->Asthma,
-                MyArrayOfPointersToPeople[i]->Stroke,
-                MyArrayOfPointersToPeople[i]->Diabetes,
-                MyArrayOfPointersToPeople[i]->CD4_cat_ARTstart,
-                MyArrayOfPointersToPeople[i]->CD4_change.at(0),
-                MyArrayOfPointersToPeople[i]->CD4_change.at(1),
-                MyArrayOfPointersToPeople[i]->CD4_change.at(2),
-                MyArrayOfPointersToPeople[i]->CD4_change.at(3),
-                MyArrayOfPointersToPeople[i]->CD4_change.at(4),
-                MyArrayOfPointersToPeople[i]->CD4_change.at(5),
-                MyArrayOfPointersToPeople[i]->CD4_change.at(6),
-                MyArrayOfPointersToPeople[i]->CauseOfDeath,
-                MyArrayOfPointersToPeople[i]->CKD,
-                MyArrayOfPointersToPeople[i]->Breast,
-                MyArrayOfPointersToPeople[i]->Cervical,
-                MyArrayOfPointersToPeople[i]->Colo,
-                MyArrayOfPointersToPeople[i]->Liver,
-                MyArrayOfPointersToPeople[i]->Oeso,
-                MyArrayOfPointersToPeople[i]->Prostate,
-                MyArrayOfPointersToPeople[i]->OtherCan,
-                MyArrayOfPointersToPeople[i]->Stroke_status,             // Check if used and, if not, remove
-                MyArrayOfPointersToPeople[i]->HPV_Status,
-                MyArrayOfPointersToPeople[i]->HPV_DateofInfection,
-                MyArrayOfPointersToPeople[i]->CIN1_DateofProgression,
-                MyArrayOfPointersToPeople[i]->CIN2_3_DateofProgression,
-                MyArrayOfPointersToPeople[i]->CIS_DateofProgression,
-                MyArrayOfPointersToPeople[i]->ICC_DateofInfection,
-                MyArrayOfPointersToPeople[i]->HPV_DateofRecovery,
-                MyArrayOfPointersToPeople[i]->CIN1_DateofRecovery,
-                MyArrayOfPointersToPeople[i]->CIN2_3_DateofRecovery,
-                MyArrayOfPointersToPeople[i]->CIS_DateofRecovery,
-                MyArrayOfPointersToPeople[i]->MI,
-                MyArrayOfPointersToPeople[i]->HC
-                );}
-    fclose(ProjectZim);
+    /* for (int i=0; i<total_population; i++) {								// Note: If adding more variables to be output, need to adapt the %x
+     fprintf(ProjectZim,"%d, %d, %f, %f, %d, %d, %f, %d, %f, %d, %d, %f, %f, %f, %f, %f, %d, %f, %f, %f, %f, %f, %f, %f, %d, %f, %f, %f, %f, %f, %f, %f, %f, %d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %d, %d \n",
+     MyArrayOfPointersToPeople[i]->PersonID,
+     MyArrayOfPointersToPeople[i]->Sex,
+     MyArrayOfPointersToPeople[i]->DoB,
+     MyArrayOfPointersToPeople[i]->Age,
+     MyArrayOfPointersToPeople[i]->MotherID,
+     MyArrayOfPointersToPeople[i]->DatesBirth.size(),
+     MyArrayOfPointersToPeople[i]->DateOfDeath,
+     MyArrayOfPointersToPeople[i]->AgeAtDeath,
+     MyArrayOfPointersToPeople[i]->HIV,
+     MyArrayOfPointersToPeople[i]->CD4_cat,
+     MyArrayOfPointersToPeople[i]->ART,
+     MyArrayOfPointersToPeople[i]->HT,
+     MyArrayOfPointersToPeople[i]->Depression,
+     MyArrayOfPointersToPeople[i]->Asthma,
+     MyArrayOfPointersToPeople[i]->Stroke,
+     MyArrayOfPointersToPeople[i]->Diabetes,
+     MyArrayOfPointersToPeople[i]->CD4_cat_ARTstart,
+     MyArrayOfPointersToPeople[i]->CD4_change.at(0),
+     MyArrayOfPointersToPeople[i]->CD4_change.at(1),
+     MyArrayOfPointersToPeople[i]->CD4_change.at(2),
+     MyArrayOfPointersToPeople[i]->CD4_change.at(3),
+     MyArrayOfPointersToPeople[i]->CD4_change.at(4),
+     MyArrayOfPointersToPeople[i]->CD4_change.at(5),
+     MyArrayOfPointersToPeople[i]->CD4_change.at(6),
+     MyArrayOfPointersToPeople[i]->CauseOfDeath,
+     MyArrayOfPointersToPeople[i]->CKD,
+     MyArrayOfPointersToPeople[i]->Breast,
+     MyArrayOfPointersToPeople[i]->Cervical,
+     MyArrayOfPointersToPeople[i]->Colo,
+     MyArrayOfPointersToPeople[i]->Liver,
+     MyArrayOfPointersToPeople[i]->Oeso,
+     MyArrayOfPointersToPeople[i]->Prostate,
+     MyArrayOfPointersToPeople[i]->OtherCan,
+     MyArrayOfPointersToPeople[i]->Stroke_status,             // Check if used and, if not, remove
+     MyArrayOfPointersToPeople[i]->HPV_Status,
+     MyArrayOfPointersToPeople[i]->HPV_DateofInfection,
+     MyArrayOfPointersToPeople[i]->CIN1_DateofProgression,
+     MyArrayOfPointersToPeople[i]->CIN2_3_DateofProgression,
+     MyArrayOfPointersToPeople[i]->CIS_DateofProgression,
+     MyArrayOfPointersToPeople[i]->ICC_DateofInfection,
+     MyArrayOfPointersToPeople[i]->HPV_DateofRecovery,
+     MyArrayOfPointersToPeople[i]->CIN1_DateofRecovery,
+     MyArrayOfPointersToPeople[i]->CIN2_3_DateofRecovery,
+     MyArrayOfPointersToPeople[i]->CIS_DateofRecovery,
+     MyArrayOfPointersToPeople[i]->MI,
+     MyArrayOfPointersToPeople[i]->HC
+     
+     );}
+     fclose(ProjectZim);*/
     
     // COUNT OUTPUT FOR FITTING
     int count_2016deaths=0;
@@ -382,7 +404,7 @@ int main(){
     cout << "CIN1_DateofRecovery "        << CIN1_DateofRecovery_m << endl;
     cout << "CIN2_3_DateofRecovery "        << CIN2_3_DateofRecovery_m << endl;
     cout << "CIS_DateofRecovery "        << CIS_DateofRecovery_m << endl;
-
+    
     
     // Least square calculation
     double sum_MinLik=  pow ((background_m  - background_d),2) +
@@ -402,7 +424,7 @@ int main(){
     
     cout << "Least Square " << sum_MinLik << endl;
     
-
+    
     
     
     //// --- LETS AVOID MEMORY LEAKS AND DELETE ALL NEW EVENTS --- ////

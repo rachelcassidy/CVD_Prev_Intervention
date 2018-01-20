@@ -6,7 +6,7 @@
 /////////////////////////////////////////////////////////////////
 
 
-#ifndef person_h 									
+#ifndef person_h
 #define person_h
 #include <vector>
 
@@ -28,7 +28,7 @@ public:
     
     double DoB;										// -- Variables related to age --
     double Age;
-
+    
     int MotherID;									// -- Variables related to Mother and Children
     vector<person*> ChildIDVector;					// ChildIDVector is its name <now holds 'people pointer'> of type vector which is the structure
     vector<double> DatesBirth;						// Hold dates of the birth of all children - vector
@@ -53,12 +53,15 @@ public:
     double CIN2_3_DateofRecovery;
     double CIS_DateofRecovery;
     
+    int HPVvaccination_status;
+    double HPVvaccination_date;
+    
     // --- Variables related to CC interventions ---
     int CC_Screening_Count;
     int CC_ScreenOutcome;
     int CC_CryoOutcome;
     double Re_ScreenOn;
-
+    
     int CD4_cat_start;
     int CD4_cat_ARTstart;
     int CD4_cat;
@@ -96,7 +99,7 @@ public:
     int Prostate_status;
     double OtherCan;
     int OtherCan_status;
-
+    
     
     vector<double> NCD_DatesVector;
     

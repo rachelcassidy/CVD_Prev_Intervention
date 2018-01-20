@@ -29,6 +29,11 @@ extern int age_atrisk_hpv;
 extern int age_tostart_CCscreening;
 extern double Sex_ratio;
 
+extern string ParamDirectory1;
+extern string ParamDirectory2;
+extern string ParamDirectory3;
+extern string ParamDirectory4;
+
 extern double HPV_Prevalence;
 //extern double CIN1_Rates[2];
 //extern double CIN2_3_Rates[2];
@@ -105,122 +110,122 @@ void loadCountryParams(int x){
         OtherCan_d   =0.71;
     }
     
- else if (x == 2){                                          // ZIMBABWE
-     cout << "You have selected Zimbabwe" << endl;
-     UN_Pop=2565000;
-     init_pop=UN_Pop/factor;
-     total_population=init_pop;
-     ART_start_yr=2004;
-     ageAdult=15;
-     age_atrisk_hpv=17;
-     Sex_ratio=0.4986;
-     ARTbuffer=1;
-     MortAdj=1;
-     // Mortality percentages from GBD 2013
-     background_d =56.6;
-     HIV_d        =29.6;
-     IHD_d         =1.00;
-     Depression_d =0.0;
-     Asthma_d     =0.7;
-     Stroke_d     =4.6;
-     Diabetes_d   =1.7;
-     CKD_d        =1.3;
-     Colo_d       =0.3;
-     Liver_d      =0.3;
-     Oeso_d       =0.6;
-     Prostate_d    =0.2;
-     OtherCan_d   =3.1;
-     }
-
-    
-
-
-else if (x == 3){                                          // MALAWI need to replace params
-    cout << "You have selected MALAWI" << endl;
-    UN_Pop=2565000;
-    init_pop=UN_Pop/factor;
-    total_population=init_pop;
-    ART_start_yr=2004;
-    ageAdult=15;
-    age_atrisk_hpv=17;
-    Sex_ratio=0.4986;
-    ARTbuffer=1;
-    MortAdj=1;
-    // Mortality percentages from GBD 2013
-    background_d =56.6;
-    HIV_d        =29.6;
-    IHD_d         =1.00;
-    Depression_d =0.0;
-    Asthma_d     =0.7;
-    Stroke_d     =4.6;
-    Diabetes_d   =1.7;
-    CKD_d        =1.3;
-    Colo_d       =0.3;
-    Liver_d      =0.3;
-    Oeso_d       =0.6;
-    Prostate_d    =0.2;
-    OtherCan_d   =3.1;
+    else if (x == 2){                                          // ZIMBABWE
+        cout << "You have selected Zimbabwe" << endl;
+        UN_Pop=2565000;
+        init_pop=UN_Pop/factor;
+        total_population=init_pop;
+        ART_start_yr=2004;
+        ageAdult=15;
+        age_atrisk_hpv=17;
+        Sex_ratio=0.4986;
+        ARTbuffer=1;
+        MortAdj=1;
+        // Mortality percentages from GBD 2013
+        background_d =56.6;
+        HIV_d        =29.6;
+        IHD_d         =1.00;
+        Depression_d =0.0;
+        Asthma_d     =0.7;
+        Stroke_d     =4.6;
+        Diabetes_d   =1.7;
+        CKD_d        =1.3;
+        Colo_d       =0.3;
+        Liver_d      =0.3;
+        Oeso_d       =0.6;
+        Prostate_d    =0.2;
+        OtherCan_d   =3.1;
     }
     
-else if (x == 4){                                          // Uasin Gishu - KENYA
-    cout << "You have selected Kenya - Uasin Gishu" << endl;
-    UN_Pop=99075;  //99075
-    init_pop=UN_Pop/factor;
-    total_population=init_pop;
-    ART_start_yr=2004;
-    ageAdult=15;
-    age_atrisk_hpv=17;
-    Sex_ratio=0.50237783022;
-    HPV_Prevalence=0.388; //normally 0.388
-    //CIN1_Rates[2]={0.2,0.8};
-    //CIN2_3_Rates[2]={0.4,0.6};
-    //CIS_Rates[2]={0.65,0.35};
-    //ICC_Rates[2]={1.0,0.0};
-    no_hpv_infection=-988;
-    hpv_date_after_death = -977;
-    HPV_Status_HPV=1;
-    HPV_Status_CIN1=2;
-    HPV_Status_CIN2_3=3;
-    HPV_Status_CIS=4;
-    HPV_Status_ICC=5;
-    HPV_Status_Recovered=6;
-    ARTbuffer=1.01;
-    MortAdj=1;
-    // Mortality percentages from GBD 2016
-    background_d =71.32;
-    HIV_d        =15.56;
-    IHD_d         =3.99;
-    Depression_d =0.0;
-    Asthma_d     =0.45;
-    Stroke_d     =3.92;
-    Diabetes_d   =1.27;
-    CKD_d        =1.5;
-    Colo_d       =0.39;
-    Liver_d      =0.34;
-    Oeso_d       =0.32;
-    Prostate_d    =0.31;
-    OtherCan_d   =0.71;
+    
+    
+    
+    else if (x == 3){                                          // MALAWI need to replace params
+        cout << "You have selected MALAWI" << endl;
+        UN_Pop=2565000;
+        init_pop=UN_Pop/factor;
+        total_population=init_pop;
+        ART_start_yr=2004;
+        ageAdult=15;
+        age_atrisk_hpv=17;
+        Sex_ratio=0.4986;
+        ARTbuffer=1;
+        MortAdj=1;
+        // Mortality percentages from GBD 2013
+        background_d =56.6;
+        HIV_d        =29.6;
+        IHD_d         =1.00;
+        Depression_d =0.0;
+        Asthma_d     =0.7;
+        Stroke_d     =4.6;
+        Diabetes_d   =1.7;
+        CKD_d        =1.3;
+        Colo_d       =0.3;
+        Liver_d      =0.3;
+        Oeso_d       =0.6;
+        Prostate_d    =0.2;
+        OtherCan_d   =3.1;
+    }
+    
+    else if (x == 4){                                          // Uasin Gishu - KENYA
+        cout << "You have selected Kenya - Uasin Gishu" << endl;
+        UN_Pop=99075;  //99075
+        init_pop=UN_Pop/factor;
+        total_population=init_pop;
+        ART_start_yr=2004;
+        ageAdult=15;
+        age_atrisk_hpv=17;
+        Sex_ratio=0.50237783022;
+        HPV_Prevalence=0.388; //normally 0.388
+        //CIN1_Rates[2]={0.2,0.8};
+        //CIN2_3_Rates[2]={0.4,0.6};
+        //CIS_Rates[2]={0.65,0.35};
+        //ICC_Rates[2]={1.0,0.0};
+        no_hpv_infection=-988;
+        hpv_date_after_death = -977;
+        HPV_Status_HPV=1;
+        HPV_Status_CIN1=2;
+        HPV_Status_CIN2_3=3;
+        HPV_Status_CIS=4;
+        HPV_Status_ICC=5;
+        HPV_Status_Recovered=6;
+        ARTbuffer=1.01;
+        MortAdj=1;
+        // Mortality percentages from GBD 2016
+        background_d =71.32;
+        HIV_d        =15.56;
+        IHD_d         =3.99;
+        Depression_d =0.0;
+        Asthma_d     =0.45;
+        Stroke_d     =3.92;
+        Diabetes_d   =1.27;
+        CKD_d        =1.5;
+        Colo_d       =0.39;
+        Liver_d      =0.34;
+        Oeso_d       =0.32;
+        Prostate_d    =0.31;
+        OtherCan_d   =0.71;
+        
+    }
     
 }
-    
-    }
 
 
 
 void getParamsString(int x){
     if (x == 1){
-        ParamDirectory="/Users/Monkeyface/Dropbox/Ageing in Kenya and Zimbabwe - project/Model_wHPV/Model_Africa_HPV/HIVModelZimbabwe/Kenya/";
+        ParamDirectory=ParamDirectory1;
     }
-
+    
     else if (x == 2){
-        ParamDirectory="/Users/Monkeyface/Dropbox/Ageing in Kenya and Zimbabwe - project/Model_wHPV/Model_Africa_HPV/HIVModelZimbabwe/Zimbabwe/";
+        ParamDirectory=ParamDirectory2;
     }
     else if (x == 3){
-        ParamDirectory="/Users/Monkeyface/Dropbox/Ageing in Kenya and Zimbabwe - project/Model_wHPV/Model_Africa_HPV/HIVModelZimbabwe/Malawi/";
+        ParamDirectory=ParamDirectory3;
     }
     
     else if (x == 4){
-        ParamDirectory="/Users/Monkeyface/Dropbox/Ageing in Kenya and Zimbabwe - project/Model_wHPV/Model_Africa_HPV/HIVModelZimbabwe/Kenya_UG/";
+        ParamDirectory=ParamDirectory4;
     }
     
     

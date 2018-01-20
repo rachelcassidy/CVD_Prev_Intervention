@@ -49,7 +49,7 @@ extern int age_atrisk_hpv;
 extern int age_tostart_CCscreening;
 
 //// --- POINTERS TO EXTERNAL ARRAYS --- ////
-extern double** BirthArray;							 	
+extern double** BirthArray;
 extern double** DeathArray_Women;
 extern double** DeathArray_Men;
 
@@ -115,7 +115,10 @@ person::person()											// First 'person' class second constructor/variable a
     CC_ScreenOutcome=-999;
     CC_CryoOutcome=-999;
     Re_ScreenOn=-999;
-
+    
+    HPVvaccination_status=0;
+    HPVvaccination_date=-999;
+    
     CD4_cat_start=-999;                                     // CD4 at HIV infection
     CD4_cat_ARTstart=-999;
     CD4_cat=-999;											// Where 0=>500, 1=350-500, 2=250-350, 3=200-250, 4=100-200, 5=50-100, and 6=<50
@@ -384,7 +387,7 @@ void person::GetMyDateOfHPVInfection(){
         
         double TestHPVDate=-997;
         double h = ((double) rand() / (RAND_MAX));
-
+        
         if (h>HPVarray[2][65]){HPV_DateofInfection=-988;              // -988 in case they do NOT get HPV ever
             //cout << PersonID << " drew a risk for HPV infection of " << h << ". Therefore " << TestHPVDate << endl;
         }
@@ -397,20 +400,20 @@ void person::GetMyDateOfHPVInfection(){
             double YearFraction=(RandomMinMax(1,12))/ 12.1;             // Get a random month as a fraction of a year
             TestHPVDate = DoB+i+YearFraction;                           // Get the date of HPV infection
             HPV_DateofInfection=TestHPVDate;
-        //cout << PersonID << " drew a risk for HPV infection of " << h << ". She developed HPV infection in " << TestHPVDate << ", aged " << TestHPVDate-DoB << endl;
+            //cout << PersonID << " drew a risk for HPV infection of " << h << ". She developed HPV infection in " << TestHPVDate << ", aged " << TestHPVDate-DoB << endl;
         }
     }
     
     //// --- Lets feed HPV infection into the eventQ --- ////
     if (HPV_DateofInfection>=*p_GT && HPV_DateofInfection<EndYear){
-            int p=PersonID-1;
-            event * HPV_DateofInfectionEvent = new event;
-            Events.push_back(HPV_DateofInfectionEvent);
-            HPV_DateofInfectionEvent->time = HPV_DateofInfection;
-            HPV_DateofInfectionEvent->p_fun = &EventMyHPVInfection;
-            HPV_DateofInfectionEvent->person_ID = MyArrayOfPointersToPeople[p];
-            p_PQ->push(HPV_DateofInfectionEvent);
-        }
+        int p=PersonID-1;
+        event * HPV_DateofInfectionEvent = new event;
+        Events.push_back(HPV_DateofInfectionEvent);
+        HPV_DateofInfectionEvent->time = HPV_DateofInfection;
+        HPV_DateofInfectionEvent->p_fun = &EventMyHPVInfection;
+        HPV_DateofInfectionEvent->person_ID = MyArrayOfPointersToPeople[p];
+        p_PQ->push(HPV_DateofInfectionEvent);
+    }
     
 }
 
@@ -439,19 +442,19 @@ void person::GetMyDateOfHIVInfection(){
             if(months>=1){YearFraction=(RandomMinMax(0,months))/12.1;}			// This gets month of birth as a fraction of a year
             if(months<1){YearFraction=0;}
             double	h = ((double)rand() / (RAND_MAX));				// Get a random number between 0 and 1.  NB/ THIS SHOULD HAVE A PRECISION OF 15 decimals which should be enough but lets be careful!!
- //           cout << "H" << h << endl;
+            //           cout << "H" << h << endl;
             if (Sex==1){
                 if (h>HIVArray_Men[i][120]){HIV=-988;}                // In case they do NOT get HIV ever
                 if (h<=HIVArray_Men[i][120]){                        // In case they DO get HIV in their life
                     while(h>HIVArray_Men[i][j] && j<121){j++;}
                     TestHIVDate=(DoB+j)+YearFraction;
-               //     cout << "TestHIVDate" << TestHIVDate << endl;
+                    //     cout << "TestHIVDate" << TestHIVDate << endl;
                     if (TestHIVDate<DateOfDeath && TestHIVDate>=1975){HIV=TestHIVDate;}
                     if (TestHIVDate>=DateOfDeath && TestHIVDate>=1975) {HIV=-977;}
                     if (TestHIVDate<1975) {HIV=-989;}
                 }
             }
-        
+            
             else if (Sex==2){
                 if (h>HIVArray_Women[i][120]){HIV=-988;}                // In case they do NOT get HIV ever
                 if (h<=HIVArray_Women[i][120]){                        // In case they DO get HIV in their life
@@ -462,13 +465,13 @@ void person::GetMyDateOfHIVInfection(){
                     if (TestHIVDate<1975) {HIV=-989;}
                 }
             }
-           
+            
             else {
                 cout << "Error!! We did not assign HIV " << endl;
                 cout << "Person ID " << PersonID << " DoB " << DoB << " date of death " << DateOfDeath << endl;
             }
-//            cout << "HIV" << HIV << endl;
- //cout << "HIV is " << HIV << endl;
+            //            cout << "HIV" << HIV << endl;
+            //cout << "HIV is " << HIV << endl;
             // Error message:
             if (months>12){cout << "Error 2: There is an error and HIV infection will ocurr in the wrong year: " << months << endl;}
             if (YearFraction>fractionyear){cout << "Error 2: There is an error!" << YearFraction << " and fraction " << fractionyear<< endl;cout << "Global Time "<< *p_GT << " and months " << months << endl;}
@@ -676,7 +679,7 @@ void person::GetMyDateNCD(){
                     }
                     //cout << "Date HT " << DateNCD << " or " << HT << endl;
                 }
-
+                
             }
             
             
@@ -767,7 +770,7 @@ void person::GetMyDateCancers(){
         if (cancer>3 && cancer <6 && Sex==2)
         {
             if (Sex==1) { cout << "ERROR HERE! ONE " << endl;}
-                
+            
             if (r>CancerArray[cancer][120])                             // If they DO NOT get an NCD set date to -998
             {
                 if      (cancer==4)    {Breast=-998;}
@@ -864,42 +867,42 @@ void person::GetMyDateCancers(){
         }
         
         if (cancer==6 && Sex==2){DateCancer=-955;}
-            
         
-    
-         if (DateCancer>0){
+        
+        
+        if (DateCancer>0){
             
             
-             if (cancer==4)
-             {
-                 Breast=DateCancer;
-                 //// --- Lets feed Hypertension into the eventQ --- ////
-                 if (Breast>=*p_GT && Breast<EndYear){
-                     int p=PersonID-1;
-                     event * BreastEvent = new event;
-                     Events.push_back(BreastEvent);
-                     BreastEvent->time = Breast;
-                     BreastEvent->p_fun = &EventMyBreastDate;
-                     BreastEvent->person_ID = MyArrayOfPointersToPeople[p];
-                     p_PQ->push(BreastEvent);
-                 }
-             }
-             
-             else if (cancer==5)
-             {
-                 Cervical=DateCancer;
-                 //// --- Lets feed Hypertension into the eventQ --- ////
-                 if (Cervical>=*p_GT && Cervical<EndYear){
-                     int p=PersonID-1;
-                     event * CervicalEvent = new event;
-                     Events.push_back(CervicalEvent);
-                     CervicalEvent->time = Cervical;
-                     CervicalEvent->p_fun = &EventMyCervicalDate;
-                     CervicalEvent->person_ID = MyArrayOfPointersToPeople[p];
-                     p_PQ->push(CervicalEvent);
-                 }
-             }
-             
+            if (cancer==4)
+            {
+                Breast=DateCancer;
+                //// --- Lets feed Hypertension into the eventQ --- ////
+                if (Breast>=*p_GT && Breast<EndYear){
+                    int p=PersonID-1;
+                    event * BreastEvent = new event;
+                    Events.push_back(BreastEvent);
+                    BreastEvent->time = Breast;
+                    BreastEvent->p_fun = &EventMyBreastDate;
+                    BreastEvent->person_ID = MyArrayOfPointersToPeople[p];
+                    p_PQ->push(BreastEvent);
+                }
+            }
+            
+            else if (cancer==5)
+            {
+                Cervical=DateCancer;
+                //// --- Lets feed Hypertension into the eventQ --- ////
+                if (Cervical>=*p_GT && Cervical<EndYear){
+                    int p=PersonID-1;
+                    event * CervicalEvent = new event;
+                    Events.push_back(CervicalEvent);
+                    CervicalEvent->time = Cervical;
+                    CervicalEvent->p_fun = &EventMyCervicalDate;
+                    CervicalEvent->person_ID = MyArrayOfPointersToPeople[p];
+                    p_PQ->push(CervicalEvent);
+                }
+            }
+            
             else if (cancer==0)
             {
                 Colo=DateCancer;
