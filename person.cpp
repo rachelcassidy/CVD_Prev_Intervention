@@ -115,9 +115,6 @@ person::person()											// First 'person' class second constructor/variable a
     CC_ScreenOutcome=-999;
     CC_CryoOutcome=-999;
     Re_ScreenOn=-999;
-    
-    HPVvaccination_status=0;
-    HPVvaccination_date=-999;
 
     CD4_cat_start=-999;                                     // CD4 at HIV infection
     CD4_cat_ARTstart=-999;

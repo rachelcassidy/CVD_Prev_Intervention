@@ -29,11 +29,6 @@ extern int age_atrisk_hpv;
 extern int age_tostart_CCscreening;
 extern double Sex_ratio;
 
-extern string ParamDirectory1;
-extern string ParamDirectory2;
-extern string ParamDirectory3;
-extern string ParamDirectory4;
-
 extern double HPV_Prevalence;
 //extern double CIN1_Rates[2];
 //extern double CIN2_3_Rates[2];
@@ -214,18 +209,18 @@ else if (x == 4){                                          // Uasin Gishu - KENY
 
 void getParamsString(int x){
     if (x == 1){
-        ParamDirectory=ParamDirectory1;
+        ParamDirectory="/Users/Monkeyface/Dropbox/Ageing in Kenya and Zimbabwe - project/Model_wHPV/Model_Africa_HPV/HIVModelZimbabwe/Kenya/";
     }
 
     else if (x == 2){
-        ParamDirectory=ParamDirectory2;
+        ParamDirectory="/Users/Monkeyface/Dropbox/Ageing in Kenya and Zimbabwe - project/Model_wHPV/Model_Africa_HPV/HIVModelZimbabwe/Zimbabwe/";
     }
     else if (x == 3){
-        ParamDirectory=ParamDirectory3;
+        ParamDirectory="/Users/Monkeyface/Dropbox/Ageing in Kenya and Zimbabwe - project/Model_wHPV/Model_Africa_HPV/HIVModelZimbabwe/Malawi/";
     }
     
     else if (x == 4){
-        ParamDirectory=ParamDirectory4;
+        ParamDirectory="/Users/Monkeyface/Dropbox/Ageing in Kenya and Zimbabwe - project/Model_wHPV/Model_Africa_HPV/HIVModelZimbabwe/Kenya_UG/";
     }
     
     

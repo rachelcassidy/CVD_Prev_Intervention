@@ -53,9 +53,6 @@ public:
     double CIN2_3_DateofRecovery;
     double CIS_DateofRecovery;
     
-    int HPVvaccination_status;
-    double HPVvaccination_date;
-    
     // --- Variables related to CC interventions ---
     int CC_Screening_Count;
     int CC_ScreenOutcome;

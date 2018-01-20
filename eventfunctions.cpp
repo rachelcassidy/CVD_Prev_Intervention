@@ -22,7 +22,6 @@
 #include "CParamReader.hpp"
 #include "LoadParams.h"
 #include "CountryParams.hpp"
-#include "Intervention.hpp"
 
 using namespace std;
 
@@ -160,11 +159,6 @@ int countKIDSHIVRef=0;
 int Elig_Men=0;
 int Elig_Women=0;
 int Elig_Kids=0;
-
-// Vaccination variables
-extern int age_HPVvaccination;
-extern int int_HPVvaccination;
-extern int yearintervention_start;
 
 
 
@@ -421,21 +415,6 @@ void EventBirth(person *MyPointerToPerson){
         // Link Mother and Child
         (MyArrayOfPointersToPeople[total_population-1])->MotherID=MyPointerToPerson->PersonID;			// Give child their mothers ID
         MyPointerToPerson->ChildIDVector.push_back((MyArrayOfPointersToPeople[total_population-1]));	// Give mothers their child's ID
-        
-        
-        // This code is for the HOV vaccination Intervention
-        if (*p_GT>=(yearintervention_start-age_HPVvaccination) && int_HPVvaccination==1)
-        {
-            
-            event * HPV_VaccinationEvent = new event;
-            Events.push_back(HPV_VaccinationEvent);
-            HPV_VaccinationEvent->time = MyArrayOfPointersToPeople[total_population-1]->DoB + age_HPVvaccination;
-            HPV_VaccinationEvent->p_fun = &EventMyHPVVaccination;
-            HPV_VaccinationEvent->person_ID = MyArrayOfPointersToPeople[total_population-1];
-            p_PQ->push(HPV_VaccinationEvent);
-            
-            
-        }
     
         E(cout << "We have finished giving birth " << endl;)					// Error message - can be switched on/off
         
@@ -449,8 +428,8 @@ void EventMyHPVInfection(person *MyPointerToPerson){                    // Funct
 
     E(cout << "Somebody just got infected with HPV and will either progress to CIN1 or recover: " << endl;)
     
-    if(MyPointerToPerson->Alive == 1 && MyPointerToPerson->HPV_Status<1 && MyPointerToPerson->HPVvaccination_status==0){                                  // Only execute this function if the person is still alive
-        MyPointerToPerson->Age= (*p_GT - MyPointerToPerson->DoB);       // Update age to get correct parameter belowhp
+    if(MyPointerToPerson->Alive == 1 && MyPointerToPerson->HPV_Status<1){                                  // Only execute this function if the person is still alive
+        MyPointerToPerson->Age= (*p_GT - MyPointerToPerson->DoB);       // Update age to get correct parameter below
         
         if (MyPointerToPerson->HPV_DateofInfection>0){
             MyPointerToPerson->HPV_Status=HPV_Status_HPV;

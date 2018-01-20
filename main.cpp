@@ -23,42 +23,29 @@
 #include "LoadParams.h"
 #include "CParamReader.hpp"
 #include "CountryParams.hpp"
-#include "Intervention.hpp"
-
 
 using namespace std;
 
-//// --- Control Centre --- ////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////                                   VARIABLE PARAMETERS                                                 //////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 // STEP 1 --- SELECT THE COUNTRY TO RUN THE MODEL
 // 1=KENYA      2=ZIMBABWE      3=MALAWI      4=KENYA - UG
 int country=1;
 
 // STEP 2 --- NAME THE DIRECTORY AND TAG FOR THE OUTPUT FILE
-string OutputFileDirectory="/Users/mc1405/Dropbox/KenyModel_Vacc/HIVModelZimbabwe";
-string ParamDirectory1=OutputFileDirectory + "/Kenya/";
-string ParamDirectory2=OutputFileDirectory + "/Zimbabwe/";
-string ParamDirectory3=OutputFileDirectory + "/Malawi/";;
-string ParamDirectory4=OutputFileDirectory + "/Kenya_UG/";;
+string OutputFileDirectory="/Users/Monkeyface/Dropbox/Ageing in Kenya and Zimbabwe - project/Model_wHPV/MATLAB_Pablo copy/Latest.csv";
 
-// STEP 3 --- AT WHAT FACTOR SHOULD WE RUN THE POPULATION?
+/// STEP 3 --- AT WHAT FACTOR SHOULD WE RUN THE POPULATION?
 int factor=100; //county = 1, country = 100
-
-// STEP 4 --- CHOOSE INTERVENTIONS DETAILS
-int yearintervention_start=2018;
-int int_HPVvaccination=1;
-
-// vaccination parameter
-int age_HPVvaccination=9;
-
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////                                   MODIFY IF NEEDED PARAMETERS                                        //////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 double StartYear=1950;                                                                                          //////////
 int EndYear=2035;                                                                                               //////////
-const long long int final_number_people=100000000;
-
-//////////
+const long long int final_number_people=100000000;                                                              //////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -247,21 +234,13 @@ int main(){
     
     
     //// --- EVENTQ --- ////
-    cout << "Section 5 - We are going to create key events" << endl;
+    cout << "Section 5 - We are going to create the annual events" << endl;
     
     event * TellNewYear = new event;										// --- Tell me every time  a new year start ---
     Events.push_back(TellNewYear);
     TellNewYear->time = StartYear;
     TellNewYear->p_fun = &EventTellNewYear;
     iQ.push(TellNewYear);
-    
-    event * InterventionEvent = new event;
-    Events.push_back(InterventionEvent);
-    InterventionEvent->time = yearintervention_start;
-    InterventionEvent->p_fun = &EventStartIntervention;
-    iQ.push(InterventionEvent);
-    
-    
 
     /// --- Screen all women who start ART for Cervical Cancer each year --- ///
     event * CC_First_screen = new event;
@@ -289,8 +268,8 @@ int main(){
     
     
     
-   /* for (int i=0; i<total_population; i++) {								// Note: If adding more variables to be output, need to adapt the %x
-        fprintf(ProjectZim,"%d, %d, %f, %f, %d, %d, %f, %d, %f, %d, %d, %f, %f, %f, %f, %f, %d, %f, %f, %f, %f, %f, %f, %f, %d, %f, %f, %f, %f, %f, %f, %f, %f, %d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %d, %d \n",
+    for (int i=0; i<total_population; i++) {								// Note: If adding more variables to be output, need to adapt the %x
+        fprintf(ProjectZim,"%d, %d, %f, %f, %d, %d, %f, %d, %f, %d, %d, %f, %f, %f, %f, %f, %d, %f, %f, %f, %f, %f, %f, %f, %d, %f, %f, %f, %f, %f, %f, %f, %f, %d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %d, &d \n",
                 MyArrayOfPointersToPeople[i]->PersonID,
                 MyArrayOfPointersToPeople[i]->Sex,
                 MyArrayOfPointersToPeople[i]->DoB,
@@ -337,9 +316,8 @@ int main(){
                 MyArrayOfPointersToPeople[i]->CIS_DateofRecovery,
                 MyArrayOfPointersToPeople[i]->MI,
                 MyArrayOfPointersToPeople[i]->HC
-                
                 );}
-    fclose(ProjectZim);*/
+    fclose(ProjectZim);
     
     // COUNT OUTPUT FOR FITTING
     int count_2016deaths=0;
