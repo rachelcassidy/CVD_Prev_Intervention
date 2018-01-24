@@ -18,6 +18,22 @@
 #include "eventQ.h"
 #include "LoadParams.h"
 
+
+// TO DELETE
+extern int countBase_NCD[5];
+extern int countBase_noNCD[5];
+extern int countBase_voidNCD[5];
+
+extern double Risk_NCD_Diabetes;
+extern int relatedNCDs_Diab[5];
+extern int nr_NCD_Diab;
+
+extern double Risk_DiabHC;                                        // Having high cholesterol given diabtes etc ...
+extern double Risk_DiabHT;
+extern double Risk_DiabCKD;
+extern double Risk_DiabCVD;
+
+
 //// --- OUTSIDE INFORMATION --- ////
 extern double   *p_GT;
 extern double   StartYear;
@@ -69,6 +85,10 @@ extern int*     CancerAgeArrayMax;
 extern double** HPVarray;
 
 extern double   MortAdj;
+
+extern int countBase_NCD[5];
+extern int countBase_noNCD[5];
+extern int countBase_deathNCD[5];
 
 //// --- Important Internal informtaion --- ////
 vector <float> HIVReservoir(0);
@@ -682,9 +702,24 @@ void person::GetMyDateNCD(){
                 
             }
             
-            
             NCD_DatesVector.push_back(DateNCD);
+            
+            // DELETE LATER
+            if (DateNCD<0){
+                countBase_noNCD[ncd]++;
+            }
+            
+            else if (DateNCD>0){
+                countBase_NCD[ncd]++;
+            }
+            
+            else {
+                countBase_deathNCD[ncd]++;
+            }
+            
             ncd++;                                                 // Lets do the next NCD
+            
+            
         }
     }
     E(cout << "We finished assigning NCDs!" << endl;)

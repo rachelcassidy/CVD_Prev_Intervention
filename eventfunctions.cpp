@@ -88,6 +88,13 @@ int RandomMinMax_2(int min, int max){							// Provide function for random numbe
     return rand()%(max-min+1)+min;							    // Note: if min=0 and max=4 it will generate 0,1,2,3,4
 }
 
+double randfrom(double min, double max)
+{
+    double range = (max - min);
+    double div = RAND_MAX / range;
+    return min + (rand() / div);
+}
+
 
 //// --- NCD PARAMETERS HERE --- ////
 //// NCD INTERACTION PARAMETERS ////
@@ -165,6 +172,13 @@ int Elig_Kids=0;
 extern int age_HPVvaccination;
 extern int int_HPVvaccination;
 extern int yearintervention_start;
+
+// TO DELETE
+extern int countDiab_NCD[5];
+extern int countDiab_noNCD[5];
+extern int countDiab_voidNCD[5];
+
+
 
 
 
@@ -1420,15 +1434,17 @@ void EventMyDiabetesDate(person *MyPointerToPerson){
         
         // Some basic code and finding index for not getting NCDs
         int ncd_nr=0;
-        double DateNCD=-997;                                                               // As with HIV, if they don't get NCDs set it to -998 to show code was executed
-        
+        //double DateNCD=-997;                                                               // As with HIV, if they don't get NCDs set it to -998 to show code was executed
+        int age_index=(*p_GT-MyPointerToPerson->DoB);
         
         // Re-evaluate NCD related to diabetes
         while (ncd_nr<nr_NCD_Diab)
         {
             
             // Get a random number for each NCD
-            double r = ((double) rand() / (RAND_MAX));
+            //double r =  ((double) rand() / (RAND_MAX)) ;
+            double DateNCD=-997;                                                               // As with HIV, if they don't get NCDs set it to -998 to show code was executed
+            double r = randfrom(NCDArray[relatedNCDs_Diab[ncd_nr]][age_index]*Risk_NCD_Diabetes[ncd_nr] ,1*Risk_NCD_Diabetes[ncd_nr] );
             
             // If we are getting an NCD lets get the age and date of NCD
             
@@ -1445,6 +1461,19 @@ void EventMyDiabetesDate(person *MyPointerToPerson){
                 
             }
             
+            if (MyPointerToPerson->NCD_DatesVector.at(relatedNCDs_Diab[ncd_nr])<0 && DateNCD<0){
+            //if (DateNCD<0){
+                countDiab_noNCD[ncd_nr]++;
+            }
+            
+            else if (MyPointerToPerson->NCD_DatesVector.at(relatedNCDs_Diab[ncd_nr])<0 && DateNCD>0){
+            //else if (DateNCD>0){
+                countDiab_NCD[ncd_nr]++;
+            }
+            
+            else {
+                countDiab_voidNCD[ncd_nr]++;
+            }
             
             // Lets see if this pushed forward the existing NCD date
             if (DateNCD>=*p_GT && DateNCD<MyPointerToPerson->NCD_DatesVector.at(relatedNCDs_Diab[ncd_nr]))
@@ -1452,7 +1481,7 @@ void EventMyDiabetesDate(person *MyPointerToPerson){
                 
                 // Lets update the Date everywhere and add to queue
                 MyPointerToPerson->NCD_DatesVector.at(relatedNCDs_Diab[ncd_nr])=DateNCD;
-                
+                //cout << "we are here " << endl;
                 if (ncd_nr==0)
                 {
                     MyPointerToPerson->HT=DateNCD;
