@@ -1610,19 +1610,21 @@ void EventMyHyptenDate(person *MyPointerToPerson)			// Function executed when pe
                 MyPointerToPerson->CauseOfDeath=3;
             }
         }
-    
+        
         
         // Some basic code and finding index for not getting NCDs
         int ncd_nr=0;
  //        double DateNCD=-997;          // As with HIV, if they don't get NCDs set it to -998 to show code was executed
-        int age_index=(*p_GT-MyPointerToPerson->DoB);
+        
         
         // Re-evaluate HC/HT and Renal
         while (ncd_nr<nr_NCD_HT)
             
         {
-            double DateNCD=-997;                                                               // As with HIV, if they don't get NCDs set it to -998 to show code was executed
-            double r = randfrom(NCDArray[relatedNCDs_Diab[ncd_nr]][age_index]*Risk_NCD_Diabetes[ncd_nr] ,1*Risk_NCD_Diabetes[ncd_nr] );
+            double DateNCD=-997;
+            // Get a random number for each NCD
+            double r = ((double) rand() / (RAND_MAX));
+            
             
             // If we are getting an NCD lets get the age and date of NCD
             if (r<NCDArray[relatedNCDs_HT[ncd_nr]][120]*Risk_NCD_HT[ncd_nr])
@@ -1639,7 +1641,7 @@ void EventMyHyptenDate(person *MyPointerToPerson)			// Function executed when pe
             
             
             // Lets see if this pushed forward the existing NCD date
-            if ((DateNCD>=*p_GT) && (DateNCD<MyPointerToPerson->NCD_DatesVector.at(relatedNCDs_HC[ncd_nr]))||(MyPointerToPerson->NCD_DatesVector.at(relatedNCDs_HC[ncd_nr])<0))
+            if (DateNCD>=*p_GT && DateNCD<MyPointerToPerson->NCD_DatesVector.at(relatedNCDs_HT[ncd_nr]))
             {
                 
                 // Lets update the Date everywhere and add to queue
@@ -1747,14 +1749,14 @@ void EventMyHypcholDate(person *MyPointerToPerson)			// Function executed when p
         // Some basic code and finding index for not getting NCDs
         int ncd_nr=0;
 //        double DateNCD=-997;                                       // As with HIV, if they don't get NCDs set it to -998 to show code was executed
-      int age_index=(*p_GT-MyPointerToPerson->DoB);
+        
         
         // Re-evaluate HC/HT and Renal
         while (ncd_nr<nr_NCD_HC)
         {
             // Get a random number for each NCD
-            double DateNCD=-997;                                                               // As with HIV, if they don't get NCDs set it to -998 to show code was executed
-            double r = randfrom(NCDArray[relatedNCDs_Diab[ncd_nr]][age_index]*Risk_NCD_Diabetes[ncd_nr] ,1*Risk_NCD_Diabetes[ncd_nr] );
+            double DateNCD=-997;
+            double r = ((double) rand() / (RAND_MAX));
             
             
             // If we are getting an NCD lets get the age and date of NCD
@@ -1772,7 +1774,7 @@ void EventMyHypcholDate(person *MyPointerToPerson)			// Function executed when p
             
             
             // Lets see if this pushed forward the existing NCD date
-            if ((DateNCD>=*p_GT) && (DateNCD<MyPointerToPerson->NCD_DatesVector.at(relatedNCDs_HC[ncd_nr]))||(MyPointerToPerson->NCD_DatesVector.at(relatedNCDs_HC[ncd_nr])<0))
+            if (DateNCD>=*p_GT && DateNCD<MyPointerToPerson->NCD_DatesVector.at(relatedNCDs_HC[ncd_nr]))
             {
                 
                 // Lets update the Date everywhere and add to queue
