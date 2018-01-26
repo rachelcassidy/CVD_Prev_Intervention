@@ -42,9 +42,9 @@ int countBase_deathNCD[10];
 int country=1;
 
 // STEP 2 --- NAME THE DIRECTORY AND TAG FOR THE OUTPUT FILE
-string InputFileDirectory="/Users/mc1405/Dropbox/All Work/Ageing in Kenya and Zimbabwe - project/Model_wHPV Miki copy/Model_Africa_HPV/HIVModelZimbabwe";
-string OutputFileDirectory="//Users/mc1405/Dropbox/All Work/Ageing in Kenya and Zimbabwe - project/Model_wHPV Miki copy/MATLAB_Pablo copy/MATLAB copy/Zimbabwe Results HIV/NCDHIVcheck_OFF.csv";
-                         
+string InputFileDirectory="/Users/rachelcassidy/Dropbox/Ageing in Kenya and Zimbabwe - project/KenyModel_Vacc/HIVModelZimbabwe";
+string OutputFileDirectory="/Users/rachelcassidy/Dropbox/NCDHIVcheck_OFF.csv";
+
 string ParamDirectory1=InputFileDirectory + "/Kenya/";
 string ParamDirectory2=InputFileDirectory + "/Zimbabwe/";
 string ParamDirectory3=InputFileDirectory + "/Malawi/";;
