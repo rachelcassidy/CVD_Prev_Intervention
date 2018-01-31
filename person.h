@@ -62,6 +62,11 @@ public:
     int CC_CryoOutcome;
     double Re_ScreenOn;
     
+    int CVD_Screening_Count;
+    int CVD_Treat_Outcome;
+    double CVD_HT_Treat_Date;
+    double CVD_HC_Treat_Date;
+    
     int CD4_cat_start;
     int CD4_cat_ARTstart;
     int CD4_cat;

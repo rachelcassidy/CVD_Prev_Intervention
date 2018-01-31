@@ -82,6 +82,10 @@ extern int HPV_Status_CIS;
 extern int HPV_Status_ICC;
 extern int HPV_Status_Recovered;
 
+extern int CVD_Screening_Count;
+extern int CVD_Treat_Outcome;
+extern double CVD_HT_Treat_Date;
+extern double CVD_HC_Treat_Date;
 
 //// --- Important Internal informtaion --- ////
 int RandomMinMax_2(int min, int max){							// Provide function for random number generator between min and max number
@@ -173,13 +177,14 @@ extern int age_HPVvaccination;
 extern int int_HPVvaccination;
 extern int yearintervention_start;
 
+//CVD intervention variables
+extern int yearCVDintervention_start;
+extern int int_CVDIntervention;
+
 // TO DELETE
 extern int countDiab_NCD[5];
 extern int countDiab_noNCD[5];
 extern int countDiab_voidNCD[5];
-
-
-
 
 
 //////////////////////////////////////
@@ -219,8 +224,33 @@ void EventTellNewYear(person *MyPointerToPerson){
                     MyArrayOfPointersToPeople[i]->CD4_cat_ARTstart=MyArrayOfPointersToPeople[i]->CD4_cat;       // Lets set CD4 cat at ART start
                     count_ARTKids++;                                    // Update our counter
                     Elig_Kids=Elig_Kids-1;
+                    
+                    if (int_CVDIntervention==1){
+                        if (MyArrayOfPointersToPeople[i]->ART<2018){
+                        //Push a CVD intervention date
+                            event * CVD_Screen_Date = new event;
+                            Events.push_back(CVD_Screen_Date);
+                            CVD_Screen_Date->time = 2018;
+                            CVD_Screen_Date->p_fun = &EventCVDPrevIntervention;
+                            CVD_Screen_Date->person_ID = MyArrayOfPointersToPeople[i];
+                            p_PQ->push(CVD_Screen_Date);
+                            
+                        }
+                        else {
+                        //Push a CVD intervention date
+                            event * CVD_Screen_Date = new event;
+                            Events.push_back(CVD_Screen_Date);
+                            CVD_Screen_Date->time = *p_GT;
+                            CVD_Screen_Date->p_fun = &EventCVDPrevIntervention;
+                            CVD_Screen_Date->person_ID = MyArrayOfPointersToPeople[i];
+                            p_PQ->push(CVD_Screen_Date);
+                            
+                        }
+                    }
+                        
+                    }
+                    
                 }
-            }
             
             
             // Lets see if adults start ART
@@ -244,6 +274,29 @@ void EventTellNewYear(person *MyPointerToPerson){
                         count_ARTMen_sum++;                                             // Update the sum counter
                         count_AdultsART++;
                         Elig_Men=Elig_Men-1;
+                        
+                        if (int_CVDIntervention==1){
+                            if (MyArrayOfPointersToPeople[i]->ART<2018){
+                                //Push a CVD intervention date
+                                event * CVD_Screen_Date = new event;
+                                Events.push_back(CVD_Screen_Date);
+                                CVD_Screen_Date->time = 2018;
+                                CVD_Screen_Date->p_fun = &EventCVDPrevIntervention;
+                                CVD_Screen_Date->person_ID = MyArrayOfPointersToPeople[i];
+                                p_PQ->push(CVD_Screen_Date);
+                                
+                            }
+                            else {
+                                //Push a CVD intervention date
+                                event * CVD_Screen_Date = new event;
+                                Events.push_back(CVD_Screen_Date);
+                                CVD_Screen_Date->time = *p_GT;
+                                CVD_Screen_Date->p_fun = &EventCVDPrevIntervention;
+                                CVD_Screen_Date->person_ID = MyArrayOfPointersToPeople[i];
+                                p_PQ->push(CVD_Screen_Date);
+                                
+                            }
+                        }
                     }
                     
                 }
@@ -262,6 +315,29 @@ void EventTellNewYear(person *MyPointerToPerson){
                         count_ARTWomen_sum++;                               // Update the sum counter
                         count_AdultsART++;
                         Elig_Women=Elig_Women-1;
+                        
+                        if (int_CVDIntervention==1){
+                            if (MyArrayOfPointersToPeople[i]->ART<2018){
+                                //Push a CVD intervention date
+                                event * CVD_Screen_Date = new event;
+                                Events.push_back(CVD_Screen_Date);
+                                CVD_Screen_Date->time = 2018;
+                                CVD_Screen_Date->p_fun = &EventCVDPrevIntervention;
+                                CVD_Screen_Date->person_ID = MyArrayOfPointersToPeople[i];
+                                p_PQ->push(CVD_Screen_Date);
+                                
+                            }
+                            else {
+                                //Push a CVD intervention date
+                                event * CVD_Screen_Date = new event;
+                                Events.push_back(CVD_Screen_Date);
+                                CVD_Screen_Date->time = *p_GT;
+                                CVD_Screen_Date->p_fun = &EventCVDPrevIntervention;
+                                CVD_Screen_Date->person_ID = MyArrayOfPointersToPeople[i];
+                                p_PQ->push(CVD_Screen_Date);
+                                
+                            }
+                        }
                         
                         //cout << MyArrayOfPointersToPeople[i]->PersonID << " has an ART start date of " << MyArrayOfPointersToPeople[i]->ART << endl;
                         
@@ -1260,7 +1336,7 @@ void EventMyStrokeDate(person *MyPointerToPerson)			    // Function executed whe
 {
     E(cout << endl << endl << "This patient just developed stroke!" << endl;)
     
-    if(MyPointerToPerson->Alive == 1 && MyPointerToPerson->Stroke_status==0) {
+    if(MyPointerToPerson->Alive == 1 && MyPointerToPerson->Stroke_status==0 && MyPointerToPerson->Stroke==*p_GT) {
         
         MyPointerToPerson->Stroke_status=1;
         
@@ -1317,13 +1393,14 @@ void EventMyStrokeDate(person *MyPointerToPerson)			    // Function executed whe
             }
         }
     }
+    
 }
 
 void EventMyMIDate(person *MyPointerToPerson)			    // Function executed when person develops hypertension
 {
     E(cout << endl << endl << "This patient just developed MI!" << endl;)
     
-    if(MyPointerToPerson->Alive == 1 && MyPointerToPerson->MI_status==0) {
+    if(MyPointerToPerson->Alive == 1 && MyPointerToPerson->MI_status==0 && MyPointerToPerson->MI==*p_GT) {
         
         MyPointerToPerson->MI_status=1;
         
@@ -1442,9 +1519,9 @@ void EventMyDiabetesDate(person *MyPointerToPerson){
         {
             
             // Get a random number for each NCD
-            //double r =  ((double) rand() / (RAND_MAX)) ;
+            double r =  ((double) rand() / (RAND_MAX)) ;
             double DateNCD=-997;                                                               // As with HIV, if they don't get NCDs set it to -998 to show code was executed
-            double r = randfrom(NCDArray[relatedNCDs_Diab[ncd_nr]][age_index]*Risk_NCD_Diabetes[ncd_nr] ,1*Risk_NCD_Diabetes[ncd_nr] );
+            //double r = randfrom(NCDArray[relatedNCDs_Diab[ncd_nr]][age_index]*Risk_NCD_Diabetes[ncd_nr] ,1*Risk_NCD_Diabetes[ncd_nr] );
             
             // If we are getting an NCD lets get the age and date of NCD
             
@@ -1568,7 +1645,7 @@ void EventMyHyptenDate(person *MyPointerToPerson)			// Function executed when pe
     E(cout << "I just developed Hypertension, lets see if I am at an increased risk of other NCDs!" << endl;)
     
     
-    if (MyPointerToPerson->HT_status==0 && MyPointerToPerson->Alive == 1)
+    if (MyPointerToPerson->HT_status==0 && MyPointerToPerson->Alive == 1 && MyPointerToPerson->HT==*p_GT)
     {
         // First lets update Diabetes status to make sure any over-written dates don't run the same cod again
         MyPointerToPerson->HT_status=1;
@@ -1615,15 +1692,15 @@ void EventMyHyptenDate(person *MyPointerToPerson)			// Function executed when pe
         // Some basic code and finding index for not getting NCDs
         int ncd_nr=0;
  //        double DateNCD=-997;          // As with HIV, if they don't get NCDs set it to -998 to show code was executed
-        
+        int age_index=(*p_GT-MyPointerToPerson->DoB);
         
         // Re-evaluate HC/HT and Renal
         while (ncd_nr<nr_NCD_HT)
             
         {
             double DateNCD=-997;
-            // Get a random number for each NCD
-            double r = ((double) rand() / (RAND_MAX));
+            double r =  ((double) rand() / (RAND_MAX)) ;
+            //double r = randfrom(NCDArray[relatedNCDs_HT[ncd_nr]][age_index]*Risk_NCD_HT[ncd_nr] ,1*Risk_NCD_HT[ncd_nr] );
             
             
             // If we are getting an NCD lets get the age and date of NCD
@@ -1694,7 +1771,7 @@ void EventMyHyptenDate(person *MyPointerToPerson)			// Function executed when pe
             ncd_nr++;
         }
     }
-    E(cout << endl << endl << "Hypercholesterolaemia has developed and addition risks evaluated!" << endl;)
+//    E(cout << endl << endl << "Hypercholesterolaemia has developed and addition risks evaluated!" << endl;)
 }
 
 void EventMyHypcholDate(person *MyPointerToPerson)			// Function executed when person develops hypercholesterolaemia
@@ -1749,6 +1826,7 @@ void EventMyHypcholDate(person *MyPointerToPerson)			// Function executed when p
         // Some basic code and finding index for not getting NCDs
         int ncd_nr=0;
 //        double DateNCD=-997;                                       // As with HIV, if they don't get NCDs set it to -998 to show code was executed
+        int age_index=(*p_GT-MyPointerToPerson->DoB);
         
         
         // Re-evaluate HC/HT and Renal
@@ -1756,7 +1834,9 @@ void EventMyHypcholDate(person *MyPointerToPerson)			// Function executed when p
         {
             // Get a random number for each NCD
             double DateNCD=-997;
-            double r = ((double) rand() / (RAND_MAX));
+            double r =  ((double) rand() / (RAND_MAX)) ;
+            //double r = randfrom(NCDArray[relatedNCDs_HC[ncd_nr]][age_index]*Risk_NCD_HC[ncd_nr] ,1*Risk_NCD_HC[ncd_nr] );
+            
             
             
             // If we are getting an NCD lets get the age and date of NCD
@@ -2235,5 +2315,298 @@ void EventMyOtherCanDate (person *MyPointerToPerson)			// Function executed when
     }
 }
 
+
+///////////////////////////////////CVD PREVENTION INTERVENTION///////////////////////////////////////////
+
+void EventCVDPrevIntervention(person *MyPointerToPerson){
+    if (MyPointerToPerson->Alive==1){
+        
+//        cout << "Person " << MyPointerToPerson->PersonID << " Alive " << MyPointerToPerson->Alive << " CVD Screening Count " << MyPointerToPerson->CVD_Screening_Count << " ART " << MyPointerToPerson->ART<< " HT: " << MyPointerToPerson->HT << " HC: " << MyPointerToPerson->HC << " CVD_Treat_Outcome: " << MyPointerToPerson->CVD_Treat_Outcome << " Death: " << MyPointerToPerson->DateOfDeath << " DOB " << MyPointerToPerson->DoB << endl;
+        
+        
+        MyPointerToPerson->Age=(*p_GT - MyPointerToPerson->DoB);  // Update age to get correct parameter below
+        MyPointerToPerson->CVD_Screening_Count++;
+        
+        double additionalrisk=1;
+        if (MyPointerToPerson->Diabetes_status==1){
+            additionalrisk=Risk_DiabCVD;
+        }
+        /////////////////////////////////// --- A person without any CVD risk factors is about to be screened
+        
+
+        
+        if(MyPointerToPerson->HT_status==0 && MyPointerToPerson->HC_status==0){
+//            cout << "They have nothing " << endl;
+            
+        }
+        
+        /////////////////////////////////// --- A person with hypertension is about to be screened
+        
+        if(MyPointerToPerson->HT_status==1 && MyPointerToPerson->HC_status==0 && MyPointerToPerson->CVD_Treat_Outcome!=1){
+            MyPointerToPerson->CVD_Treat_Outcome=1; //Make the treatment of HT a success
+            MyPointerToPerson->CVD_HT_Treat_Date=*p_GT;
+            
+            int ncd_nr=0; // Some basic code and finding index for not getting NCDs
+            double DateNCD=-997; // As with HIV, if they don't get NCDs set it to -998 to show code was executed
+            
+            while (ncd_nr<=2){ // Re-evaluate MI/Stroke date
+                double r = ((double) rand() / (RAND_MAX)); // Get a random number for each NCD
+    
+                    if (r<NCDArray[relatedNCDs_HT[ncd_nr]][120]*additionalrisk){
+                        int i=0; // Lets get the index for age at NCD
+                        while (r>NCDArray[relatedNCDs_HT[ncd_nr]][i]*additionalrisk){i++;}
+                        double YearFraction=(RandomMinMax_2(1,12))/12.1; // Lets get the age and date they will have the NCD
+                        DateNCD=MyPointerToPerson->DoB+i+YearFraction;
+                        
+                    }
+                
+                cout << "Person ID " << MyPointerToPerson->PersonID << " Test date 1 " << DateNCD << " old date " <<MyPointerToPerson->NCD_DatesVector.at(relatedNCDs_HT[ncd_nr]) << endl;
+                
+                if ((DateNCD>=*p_GT && DateNCD>MyPointerToPerson->NCD_DatesVector.at(relatedNCDs_HT[ncd_nr]) && MyPointerToPerson->NCD_DatesVector.at(relatedNCDs_HT[ncd_nr])>0)||(DateNCD<0)){ // Lets see if new date is further away than current date of MI/Stroke
+                    
+                    cout << "Test date 2 " << DateNCD << " old date " <<MyPointerToPerson->NCD_DatesVector.at(relatedNCDs_HT[ncd_nr]) << endl;
+                    
+                    MyPointerToPerson->NCD_DatesVector.at(relatedNCDs_HT[ncd_nr])=DateNCD; // Lets update the Date everywhere and add to queue
+                    
+                    cout << "Test date 2 " << DateNCD << " new date " <<MyPointerToPerson->NCD_DatesVector.at(relatedNCDs_HT[ncd_nr]) << endl;
+                    
+                    if (ncd_nr==0){
+                        cout << "Stroke new date! PI is: " << MyPointerToPerson->PersonID << " Stroke " << MyPointerToPerson->Stroke << endl;
+                        MyPointerToPerson->Stroke=DateNCD;
+                        
+                        if (DateNCD>0){
+                        // IF STATEMENT ONLY INSERT INTO EVENTQ IF GREATER THAN + GLOBAL TIME
+                            int p=MyPointerToPerson->PersonID-1; //// --- Lets feed Stroke into the eventQ --- ////
+                            event * StrokeEvent = new event;
+                            Events.push_back(StrokeEvent);
+                            StrokeEvent->time = MyPointerToPerson->Stroke;
+                            StrokeEvent->p_fun = &EventMyStrokeDate;
+                            StrokeEvent->person_ID = MyArrayOfPointersToPeople[p];
+                            p_PQ->push(StrokeEvent);
+                        }
+                        
+                    }
+                    
+                    if (ncd_nr==1){
+                        cout << "CKD new date! PI is: " << MyPointerToPerson->PersonID << " CKD " << MyPointerToPerson->CKD << endl;
+                        MyPointerToPerson->CKD=DateNCD;
+                        
+                        if (DateNCD>0){
+                            // IF STATEMENT ONLY INSERT INTO EVENTQ IF GREATER THAN + GLOBAL TIME
+                            int p=MyPointerToPerson->PersonID-1; //// --- Lets feed Stroke into the eventQ --- ////
+                            event * CKDEvent = new event;
+                            Events.push_back(CKDEvent);
+                            CKDEvent->time = MyPointerToPerson->CKD;
+                            CKDEvent->p_fun = &EventMyCKDDate;
+                            CKDEvent->person_ID = MyArrayOfPointersToPeople[p];
+                            p_PQ->push(CKDEvent);
+                            
+                        }
+                    }
+                    
+                    if (ncd_nr==2){
+                        cout << "MI new date! PI is: " << MyPointerToPerson->PersonID << " MI " << MyPointerToPerson->MI << endl;
+                        MyPointerToPerson->MI=DateNCD;
+                        
+                        if (DateNCD>0){
+                            // IF STATEMENT ONLY INSERT INTO EVENTQ IF GREATER THAN + GLOBAL TIME
+                            int p=MyPointerToPerson->PersonID-1;  //// --- Lets feed MI into the eventQ --- ////
+                            event * MIEvent = new event;
+                            Events.push_back(MIEvent);
+                            MIEvent->time = MyPointerToPerson->MI;
+                            MIEvent->p_fun = &EventMyMIDate;
+                            MIEvent->person_ID = MyArrayOfPointersToPeople[p];
+                            p_PQ->push(MIEvent);
+                            
+                        }
+                        
+                    }
+                }
+                ncd_nr++;
+                
+            }
+            
+        }
+        
+        /////////////////////////////////// --- A person with hypercholesterol is about to be screened
+        
+        if(MyPointerToPerson->HT_status==0 && MyPointerToPerson->HC_status==1 && MyPointerToPerson->CVD_Treat_Outcome!=2){
+            MyPointerToPerson->CVD_Treat_Outcome=2;
+            MyPointerToPerson->CVD_HC_Treat_Date=*p_GT;
+            int ncd_nr=0; // Some basic code and finding index for not getting NCDs
+            double DateNCD=-997; // As with HIV, if they don't get NCDs set it to -998 to show code was executed
+            
+            while (ncd_nr<=2){ // Re-evaluate MI/Stroke date
+                double r = ((double) rand() / (RAND_MAX)); // Get a random number for each NCD
+                
+                if (r<NCDArray[relatedNCDs_HC[ncd_nr]][120]*additionalrisk){
+                    int i=0; // Lets get the index for age at NCD
+                    while (r>NCDArray[relatedNCDs_HC[ncd_nr]][i]*additionalrisk){i++;}
+                    double YearFraction=(RandomMinMax_2(1,12))/12.1; // Lets get the age and date they will have the NCD
+                    DateNCD=MyPointerToPerson->DoB+i+YearFraction;
+                    
+                }
+        
+                if ((DateNCD>=*p_GT && DateNCD>MyPointerToPerson->NCD_DatesVector.at(relatedNCDs_HC[ncd_nr]) && MyPointerToPerson->NCD_DatesVector.at(relatedNCDs_HC[ncd_nr])>0)||(DateNCD<0)){ // Lets see if new date is further away than current date of MI/Stroke
+                    
+                MyPointerToPerson->NCD_DatesVector.at(relatedNCDs_HC[ncd_nr])=DateNCD; // Lets update the Date everywhere and add to queue
+                    
+                    if (ncd_nr==0){
+                        cout << "HT new date! PI is: " << MyPointerToPerson->PersonID << " HT " << MyPointerToPerson->HT << endl;
+                        MyPointerToPerson->HT=DateNCD;
+                        
+                        if (DateNCD>0){
+                        // IF STATEMENT ONLY INSERT INTO EVENTQ IF GREATER THAN + GLOBAL TIME
+                            int p=MyPointerToPerson->PersonID; //// --- Lets feed Hypertension into the eventQ --- ////
+                            event * HTEvent = new event;
+                            Events.push_back(HTEvent);
+                            HTEvent->time = MyPointerToPerson->HT;
+                            HTEvent->p_fun = &EventMyHyptenDate;
+                            HTEvent->person_ID = MyArrayOfPointersToPeople[p];
+                            p_PQ->push(HTEvent);
+                        }
+                        
+                    }
+                    
+                    if (ncd_nr==1){
+                        cout << "Stroke new date! PI is: " << MyPointerToPerson->PersonID << " Stroke " << MyPointerToPerson->Stroke << endl;
+                        MyPointerToPerson->Stroke=DateNCD;
+                        
+                        if (DateNCD>0){
+                        // IF STATEMENT ONLY INSERT INTO EVENTQ IF GREATER THAN + GLOBAL TIME
+                            int p=MyPointerToPerson->PersonID-1; //// --- Lets feed Stroke into the eventQ --- ////
+                            event * StrokeEvent = new event;
+                            Events.push_back(StrokeEvent);
+                            StrokeEvent->time = MyPointerToPerson->Stroke;
+                            StrokeEvent->p_fun = &EventMyStrokeDate;
+                            StrokeEvent->person_ID = MyArrayOfPointersToPeople[p];
+                            p_PQ->push(StrokeEvent);
+                        }
+                    }
+                    
+                    if (ncd_nr==2){
+                        cout << "MI new date! PI is: " << MyPointerToPerson->PersonID << " MI " << MyPointerToPerson->MI << endl;
+                        MyPointerToPerson->MI=DateNCD;
+                        
+                        if (DateNCD>0){
+                            // IF STATEMENT ONLY INSERT INTO EVENTQ IF GREATER THAN + GLOBAL TIME
+                            int p=MyPointerToPerson->PersonID-1; //// --- Lets feed MI into the eventQ --- ////
+                            event * MIEvent = new event;
+                            Events.push_back(MIEvent);
+                            MIEvent->time = MyPointerToPerson->MI;
+                            MIEvent->p_fun = &EventMyMIDate;
+                            MIEvent->person_ID = MyArrayOfPointersToPeople[p];
+                            p_PQ->push(MIEvent);
+                        }
+                    }
+                }
+                
+                ncd_nr++;
+                
+            }
+            
+        }
+        
+        /////////////////////////////////// --- A person with hypertension and hypercholesterol is about to be screened
+        
+        if(MyPointerToPerson->HT_status==1 && MyPointerToPerson->HC_status==1 && MyPointerToPerson->CVD_Treat_Outcome!=3){
+            
+            if(MyPointerToPerson->CVD_Treat_Outcome==1){
+                MyPointerToPerson->CVD_HT_Treat_Date=*p_GT;
+            }
+            if(MyPointerToPerson->CVD_Treat_Outcome==2){
+                MyPointerToPerson->CVD_HC_Treat_Date=*p_GT;
+            }
+            
+            int ncd_nr=0; // Some basic code and finding index for not getting NCDs
+            double DateNCD=-997; // As with HIV, if they don't get NCDs set it to -998 to show code was executed
+            
+            while (ncd_nr<=2){ // Re-evaluate MI/Stroke date
+                double r = ((double) rand() / (RAND_MAX)); // Get a random number for each NCD
+                
+                if (r<NCDArray[relatedNCDs_HT[ncd_nr]][120]*additionalrisk){
+                    int i=0; // Lets get the index for age at NCD
+                    while (r>NCDArray[relatedNCDs_HT[ncd_nr]][i]*additionalrisk){i++;}
+                    double YearFraction=(RandomMinMax_2(1,12))/12.1; // Lets get the age and date they will have the NCD
+                    DateNCD=MyPointerToPerson->DoB+i+YearFraction;
+                    
+                }
+                
+                if ((DateNCD>=*p_GT && DateNCD>MyPointerToPerson->NCD_DatesVector.at(relatedNCDs_HT[ncd_nr]) && MyPointerToPerson->NCD_DatesVector.at(relatedNCDs_HT[ncd_nr])>0)||(DateNCD<0)){ // Lets see if new date is further away than current date of MI/Stroke
+                    
+                    MyPointerToPerson->NCD_DatesVector.at(relatedNCDs_HT[ncd_nr])=DateNCD; // Lets update the Date everywhere and add to queue
+                    
+                    if (ncd_nr==0){
+                        cout << "Stroke new date! PI is: " << MyPointerToPerson->PersonID << " Stroke " << MyPointerToPerson->Stroke << endl;
+                        MyPointerToPerson->Stroke=DateNCD;
+                        
+                        if (DateNCD>0){
+                            // IF STATEMENT ONLY INSERT INTO EVENTQ IF GREATER THAN + GLOBAL TIME
+                            int p=MyPointerToPerson->PersonID-1; //// --- Lets feed Stroke into the eventQ --- ////
+                            event * StrokeEvent = new event;
+                            Events.push_back(StrokeEvent);
+                            StrokeEvent->time = MyPointerToPerson->Stroke;
+                            StrokeEvent->p_fun = &EventMyStrokeDate;
+                            StrokeEvent->person_ID = MyArrayOfPointersToPeople[p];
+                            p_PQ->push(StrokeEvent);
+                        }
+                    }
+                    
+                    if (ncd_nr==1){
+                        if (MyPointerToPerson->CVD_Treat_Outcome==1){
+                        cout << "CKD new date! PI is: " << MyPointerToPerson->PersonID << " CKD " << MyPointerToPerson->CKD << endl;
+                        MyPointerToPerson->CKD=DateNCD;
+                            if (DateNCD>0){
+                            // IF STATEMENT ONLY INSERT INTO EVENTQ IF GREATER THAN + GLOBAL TIME
+                                int p=MyPointerToPerson->PersonID-1; //// --- Lets feed Stroke into the eventQ --- ////
+                                event * CKDEvent = new event;
+                                Events.push_back(CKDEvent);
+                                CKDEvent->time = MyPointerToPerson->CKD;
+                                CKDEvent->p_fun = &EventMyCKDDate;
+                                CKDEvent->person_ID = MyArrayOfPointersToPeople[p];
+                                p_PQ->push(CKDEvent);
+                                
+                            }
+                        }
+                    }
+                
+                    if (ncd_nr==2){
+                        cout << "MI new date! PI is: " << MyPointerToPerson->PersonID << " MI " << MyPointerToPerson->MI << endl;
+                        MyPointerToPerson->MI=DateNCD;
+                        
+                        if (DateNCD>0){
+                            // IF STATEMENT ONLY INSERT INTO EVENTQ IF GREATER THAN + GLOBAL TIME
+                            int p=MyPointerToPerson->PersonID-1;  //// --- Lets feed MI into the eventQ --- ////
+                            event * MIEvent = new event;
+                            Events.push_back(MIEvent);
+                            MIEvent->time = MyPointerToPerson->MI;
+                            MIEvent->p_fun = &EventMyMIDate;
+                            MIEvent->person_ID = MyArrayOfPointersToPeople[p];
+                            p_PQ->push(MIEvent);
+                            
+                        }
+                    }
+                }
+                ncd_nr++;
+                
+            }
+            MyPointerToPerson->CVD_Treat_Outcome=3;
+            
+        }
+        
+    }
+    
+//    cout << "Person " << MyPointerToPerson->PersonID << " Alive " << MyPointerToPerson->Alive << " CVD Screening Count " << MyPointerToPerson->CVD_Screening_Count << " ART " << MyPointerToPerson->ART<< " HT: " << MyPointerToPerson->HT << " HC: " << MyPointerToPerson->HC << " CVD_Treat_Outcome: " << MyPointerToPerson->CVD_Treat_Outcome << " Death: " << MyPointerToPerson->DateOfDeath << " DOB " << MyPointerToPerson->DoB << endl;
+    
+    // Schedule event for next year
+    int p=MyPointerToPerson->PersonID-1;
+    event * RecurrentCVD_Screen = new event;
+    Events.push_back(RecurrentCVD_Screen);
+    RecurrentCVD_Screen->time = *p_GT + 3;
+    RecurrentCVD_Screen->p_fun = &EventCVDPrevIntervention;
+    RecurrentCVD_Screen->person_ID = MyArrayOfPointersToPeople[p];
+    p_PQ->push(RecurrentCVD_Screen);
+    
+}
 
 

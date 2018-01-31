@@ -64,6 +64,10 @@ extern double no_hpv_infection;
 extern int age_atrisk_hpv;
 extern int age_tostart_CCscreening;
 
+extern int CVD_Screening_Count;
+extern int CVD_Treat_Outcome;
+extern double CVD_HT_Treat_Date;
+extern double CVD_HC_Treat_Date;
 //// --- POINTERS TO EXTERNAL ARRAYS --- ////
 extern double** BirthArray;
 extern double** DeathArray_Women;
@@ -138,6 +142,11 @@ person::person()											// First 'person' class second constructor/variable a
     
     HPVvaccination_status=0;
     HPVvaccination_date=-999;
+    
+    CVD_Screening_Count=0;
+    CVD_Treat_Outcome=-999;
+    CVD_HT_Treat_Date=-999;
+    CVD_HC_Treat_Date=-999;
     
     CD4_cat_start=-999;                                     // CD4 at HIV infection
     CD4_cat_ARTstart=-999;
@@ -1023,14 +1032,3 @@ void person::GetMyDateCancers(){
     }
     E(cout << "We finished assigning Cancers!" << endl;)
 }
-
-
-
-
-
-
-
-
-
-
-

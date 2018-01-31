@@ -19,6 +19,8 @@ using namespace std;
 
 void EventStartIntervention(person *MyPointerToPerson);        // This function contains all interventions we want to roll out
 
+void EventStartCVDIntervention(person *MyPointerToPerson);        // This function contains all interventions we want to roll out
+
 void EventMyHPVVaccination(person *MyPointerToPerson);          // Vaccinated kids for HPV
 
 

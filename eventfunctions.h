@@ -33,6 +33,12 @@ using namespace std;
     void EventMyCISStatus(person *MyPointerToPerson);           // Function executed once person progresses from CIN2_3 to CIS
     void EventMyICCStatus(person *MyPointerToPerson);           // Function executed once person progresses from CIS to ICC
 
+    //// --- CVD Intervention ---
+
+    void EventCVDPrevIntervention(person *MyPointerToPerson); //Start CVD intervention
+
+
+
     //// --- Cervical cancer interventions ---
     void EventMyFirst_VIA_Screening(person *MyPointerToPerson);
     void EventMy_VIA_FollowUp(person *MyPointerToPerson);

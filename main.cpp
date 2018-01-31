@@ -55,7 +55,9 @@ int factor=100; //county = 1, country = 100
 
 // STEP 4 --- CHOOSE INTERVENTIONS DETAILS
 int yearintervention_start=2018;
+int yearCVDintervention_start=2018;
 int int_HPVvaccination=1;
+int int_CVDIntervention=1;
 
 // vaccination parameter
 int age_HPVvaccination=9;
@@ -267,6 +269,12 @@ int main(){
     InterventionEvent->p_fun = &EventStartIntervention;
     iQ.push(InterventionEvent);
     
+    event * CVDInterventionEvent = new event;
+    Events.push_back(CVDInterventionEvent);
+    CVDInterventionEvent->time = yearCVDintervention_start;
+    CVDInterventionEvent->p_fun = &EventStartCVDIntervention;
+    iQ.push(CVDInterventionEvent);
+    
     
     
     /// --- Screen all women who start ART for Cervical Cancer each year --- ///
@@ -296,7 +304,7 @@ int main(){
     
     
      for (int i=0; i<total_population; i++) {								// Note: If adding more variables to be output, need to adapt the %x
-     fprintf(ProjectZim,"%d, %d, %f, %f, %d, %d, %f, %d, %f, %d, %d, %f, %f, %f, %f, %f, %d, %f, %f, %f, %f, %f, %f, %f, %d, %f, %f, %f, %f, %f, %f, %f, %f, %d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f \n",
+     fprintf(ProjectZim,"%d, %d, %f, %f, %d, %d, %f, %d, %f, %d, %d, %f, %f, %f, %f, %f, %d, %f, %f, %f, %f, %f, %f, %f, %d, %f, %f, %f, %f, %f, %f, %f, %f, %d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f \n",
      MyArrayOfPointersToPeople[i]->PersonID,
      MyArrayOfPointersToPeople[i]->Sex,
      MyArrayOfPointersToPeople[i]->DoB,
@@ -342,7 +350,9 @@ int main(){
      MyArrayOfPointersToPeople[i]->CIN2_3_DateofRecovery,
      MyArrayOfPointersToPeople[i]->CIS_DateofRecovery,
      MyArrayOfPointersToPeople[i]->MI,
-     MyArrayOfPointersToPeople[i]->HC
+     MyArrayOfPointersToPeople[i]->HC,
+     MyArrayOfPointersToPeople[i]->CVD_HT_Treat_Date,
+     MyArrayOfPointersToPeople[i]->CVD_HC_Treat_Date
      
      );}
      fclose(ProjectZim);

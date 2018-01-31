@@ -43,6 +43,7 @@ extern vector<event*> Events;
 extern int ART_start_yr;
 extern int country;
 extern int int_HPVvaccination;
+extern int int_CVDIntervention;
 
 // Function that contains all interventions to be rolled out - adjust as needed
 void EventStartIntervention(person *MyPointerToPerson){
@@ -50,6 +51,18 @@ void EventStartIntervention(person *MyPointerToPerson){
     
     // Rolling out HPV vaccination
     if (int_HPVvaccination==1)
+    {
+        cout << "We are rolling out vaccination for HPV and it is the year: " << *p_GT << endl;
+    }
+    
+}
+
+// Function that contains all interventions to be rolled out - adjust as needed
+void EventStartCVDIntervention(person *MyPointerToPerson){
+    
+    
+    // Rolling out HPV vaccination
+    if (int_CVDIntervention==1)
     {
         cout << "We are rolling out vaccination for HPV and it is the year: " << *p_GT << endl;
     }
